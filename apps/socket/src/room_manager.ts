@@ -23,14 +23,16 @@ export class RedisSubscriptionManager {
         user_id: string
     }>>;
 
-    constructor() {
+    private constructor() {
         this.publisher = createClient();
+        this.publisher.connect();
         this.subscriber= createClient();
+        this.subscriber.connect();
         this.subscriptions = new Map();
         this.reverse_subscription = new Map();
     }
 
-    public static get_instance():RedisSubscriptionManager {
+    static get_instance():RedisSubscriptionManager {
         if(!RedisSubscriptionManager.instance){
             RedisSubscriptionManager.instance = new RedisSubscriptionManager();
         }
@@ -38,7 +40,7 @@ export class RedisSubscriptionManager {
         return RedisSubscriptionManager.instance;
     }
 
-    public subscribe({room_id, client}:{
+    subscribe({room_id, client}:{
         room_id: string,
         client: Client
     })
@@ -80,7 +82,7 @@ export class RedisSubscriptionManager {
         }    
     }
 
-    public unsubscribe({room_id, client}:{
+    unsubscribe({room_id, client}:{
         room_id: string,
         client: Client
     }){
@@ -108,15 +110,15 @@ export class RedisSubscriptionManager {
         }
     }
 
-    public message({room_id,payload}:{room_id: string, payload: string}){
+    message({room_id,payload}:{room_id: string, payload: string}){
         this.publisher.publish(room_id,payload);
     }
 
-    public get_room_size(room_id: string){
+    get_room_size(room_id: string){
         return Object.keys(this.reverse_subscription.get(room_id) ?? {}).length;
     }
 
-    public get_room_members(room_id: string){
+    get_room_members(room_id: string){
         const clients = this.reverse_subscription.get(room_id) ?? {};
         const members = Object.values(clients).map((client)=>({
             user_id: client.user_id
