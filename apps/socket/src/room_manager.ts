@@ -7,6 +7,7 @@ import type WebSocket from "ws";
 type Client = {
     ws: WebSocket,
     id: string,
+    user_id: string
 }
 
 export class RedisSubscriptionManager {
@@ -18,7 +19,8 @@ export class RedisSubscriptionManager {
     // key: room_id value: all the clients joined to this room
     private reverse_subscription: Map<string, Record<string, {
         ws: WebSocket,
-        id: string
+        id: string,
+        user_id: string
     }>>;
 
     constructor() {
@@ -29,11 +31,11 @@ export class RedisSubscriptionManager {
     }
 
     public static get_instance():RedisSubscriptionManager {
-        if(RedisSubscriptionManager.instance){
-            return RedisSubscriptionManager.instance;
+        if(!RedisSubscriptionManager.instance){
+            RedisSubscriptionManager.instance = new RedisSubscriptionManager();
         }
 
-        return new RedisSubscriptionManager();
+        return RedisSubscriptionManager.instance;
     }
 
     public subscribe({room_id, client}:{
@@ -52,7 +54,8 @@ export class RedisSubscriptionManager {
 
         this.reverse_subscription.set(room_id,{...clients_already_in_room, [client.id]:{
             ws: client.ws,
-            id: client.id
+            id: client.id,
+            user_id: client.user_id
         }});
 
         const room_size = Object.keys(this.reverse_subscription.get(room_id) ?? {}).length;
@@ -111,5 +114,14 @@ export class RedisSubscriptionManager {
 
     public get_room_size(room_id: string){
         return Object.keys(this.reverse_subscription.get(room_id) ?? {}).length;
+    }
+
+    public get_room_members(room_id: string){
+        const clients = this.reverse_subscription.get(room_id) ?? {};
+        const members = Object.values(clients).map((client)=>({
+            user_id: client.user_id
+        }));
+
+        return members;
     }
 }
