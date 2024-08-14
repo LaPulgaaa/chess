@@ -90,7 +90,7 @@ wss.on("connection",(ws)=>{
                     game_id: room_id,
                     move,
                 })
-                if(resp !== undefined){
+                if(resp !== undefined && typeof resp !== "string"){
                     RedisSubscriptionManager.get_instance().message({
                         room_id:`${room_id}_watch`,
                         payload: resp.after
@@ -98,6 +98,12 @@ wss.on("connection",(ws)=>{
                     RedisSubscriptionManager.get_instance().message({
                         room_id:`${room_id}_play`,
                         payload: resp.after
+                    })
+                }
+                else{
+                    RedisSubscriptionManager.get_instance().message({
+                        room_id:`${room_id}_play`,
+                        payload: resp ?? "error occured"
                     })
                 }
                 break;

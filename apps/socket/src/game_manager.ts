@@ -34,13 +34,19 @@ export class GameManager{
         }}
     }
 
-    public make_move({game_id, move}:{game_id: string, move: string}): Move | undefined{
+    public make_move({game_id, move}:{game_id: string, move: string}): Move | undefined | string{
         const game = this.game_record[game_id];
 
         if(game === undefined)
             return undefined;
 
-        return game.chess.move(move);
+        try{
+            const resp = game.chess.move(move);
+            return resp;
+        }catch(err){
+            console.log(err);
+            return "Invalid"
+        }
     }
 
     public get_board(game_id: string): string | undefined {
