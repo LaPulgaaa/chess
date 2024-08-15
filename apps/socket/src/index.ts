@@ -1,10 +1,9 @@
 import { WebSocketServer as WSSocketServer }from "ws";
 import WebSocket from "ws";
-import type { Square } from "chess.js";
 
 import { RedisSubscriptionManager } from "./room_manager";
 import * as game from "./game";
-import type { Player } from "./game";
+import type { Player, PlayerMoveIncomingData } from "./game";
 
 const WebSocketServer = WSSocketServer || WebSocket.Server;
 
@@ -25,12 +24,7 @@ export type IncomingClientData = {
     type: "JOIN",
     game_id: string,
     user: User,
-} | {
-    type: "MOVE",
-    game_id: string,
-    user: User,
-    move: Square,
-};
+} | PlayerMoveIncomingData;
 
 const ws_clients:WsClients = {};
 let client_count = 0;
@@ -43,13 +37,13 @@ wss.on("connection",(ws)=>{
     ws.on("message",(raw_data)=>{
         const incoming_data: IncomingClientData = JSON.parse(`${raw_data}`);
         const {type} = incoming_data;
-        const {user,game_id} = incoming_data;
+        const {game_id} = incoming_data;
 
         switch(type){
             case "JOIN":{
+                const user = incoming_data.user;
                 const room_size = RedisSubscriptionManager.get_instance().get_room_size(game_id);
                 let subscription_id = `${game_id}:watch`;
-
                 if(user.type === "PLAYER" && room_size <2){
                     subscription_id = `${game_id}:play`;
                     if(room_size === 1){
@@ -90,6 +84,27 @@ wss.on("connection",(ws)=>{
                     user_id: user.user_id
                 }
 
+                break;
+            }
+            case "MOVE" : {
+                const move = incoming_data.move;
+                const player = incoming_data.user;
+                const resp = game.handle_move({
+                    type: "MOVE" as const,
+                    game_id,
+                    user: player,
+                    move,
+                });
+                if(resp !== undefined){
+                    RedisSubscriptionManager.get_instance().message({
+                        room_id: `${game_id}:play`,
+                        payload: resp
+                    });
+                    RedisSubscriptionManager.get_instance().message({
+                        room_id: `${game_id}:watch`,
+                        payload: resp
+                    })
+                }
                 break;
             }
         }
