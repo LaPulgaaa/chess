@@ -3,7 +3,8 @@ import WebSocket from "ws";
 import type { Square } from "chess.js";
 
 import { RedisSubscriptionManager } from "./room_manager";
-import { GameManager } from "./game_manager";
+import * as game from "./game";
+import type { Player } from "./game";
 
 const WebSocketServer = WSSocketServer || WebSocket.Server;
 
@@ -15,13 +16,7 @@ type WsClients = Record<number, {
     user_id: string
 }>;
 
-export type Color = "white" | "black";
-
-type User = {
-    type: "PLAYER",
-    user_id: string,
-    color: Color
-} | {
+export type User = Player | {
     type: "SPECTATOR",
     user_id: string
 }
@@ -58,14 +53,13 @@ wss.on("connection",(ws)=>{
                 if(user.type === "PLAYER" && room_size <2){
                     subscription_id = `${game_id}:play`;
                     if(room_size === 1){
-                        const already_joined_player = RedisSubscriptionManager.get_instance().get_room_members(subscription_id)[0]!;
-                        const white = already_joined_player.color === "white" ? already_joined_player.user_id : user.user_id;
-                        const black = already_joined_player.user_id === white ? user.user_id : already_joined_player.user_id;
-                        GameManager.get_instance().add_game({
-                            game_id,
-                            white,
-                            black
-                        })
+                        const already_joined = RedisSubscriptionManager.get_instance().get_room_members(subscription_id)[0]!;
+                        const already_joined_player = {
+                            type: "PLAYER" as const,
+                            user_id: already_joined.user_id,
+                            color: already_joined.color!
+                        }
+                        game.create_game(game_id,already_joined_player,user);
                     }
 
                    
