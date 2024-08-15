@@ -1,9 +1,9 @@
 import { WebSocketServer as WSSocketServer }from "ws";
 import WebSocket from "ws";
+import type { Square } from "chess.js";
 
 import { RedisSubscriptionManager } from "./room_manager";
 import { GameManager } from "./game_manager";
-import assert from "minimalistic-assert";
 
 const WebSocketServer = WSSocketServer || WebSocket.Server;
 
@@ -15,10 +15,29 @@ type WsClients = Record<number, {
     user_id: string
 }>;
 
-export type MessageType = "PLAY" | "JOIN";
-export type MemberType = "PLAYER" | "SPECTATOR";
+export type Color = "white" | "black";
 
-let ws_clients:WsClients = {};
+type User = {
+    type: "PLAYER",
+    user_id: string,
+    color: Color
+} | {
+    type: "SPECTATOR",
+    user_id: string
+}
+
+export type IncomingClientData = {
+    type: "JOIN",
+    game_id: string,
+    user: User,
+} | {
+    type: "MOVE",
+    game_id: string,
+    user: User,
+    move: Square,
+};
+
+const ws_clients:WsClients = {};
 let client_count = 0;
 
 wss.on("connection",(ws)=>{
@@ -27,86 +46,58 @@ wss.on("connection",(ws)=>{
     console.log("connection made")
 
     ws.on("message",(raw_data)=>{
-        const data = JSON.parse(`${raw_data}`);
+        const incoming_data: IncomingClientData = JSON.parse(`${raw_data}`);
+        const {type} = incoming_data;
+        const {user,game_id} = incoming_data;
 
-        const msg_type: MessageType = data.type;
-        const room_id: string = data.room_id;
-        const user_id: string = data.user_id;
-        const type: MemberType = data.client.type;
-        
-        switch(msg_type){
-            case "JOIN":
-                let room_opcode;
-                if(type === "PLAYER")
-                {
-                    const color: "white" | "black" = data.color;
-                    room_opcode = `${room_id}_play`;
-                    const players_in_room = RedisSubscriptionManager.get_instance().get_room_size(room_opcode);
+        switch(type){
+            case "JOIN":{
+                const room_size = RedisSubscriptionManager.get_instance().get_room_size(game_id);
+                let subscription_id = `${game_id}:watch`;
 
-                    // TODO: send a message to client notifying that
-                    // room size is full
-                    if(players_in_room >= 2){
-                        room_opcode = `${room_id}_watch`;
-                    }
-                    else if(players_in_room == 1){
-                        const already_joined = RedisSubscriptionManager.get_instance().get_room_members(room_opcode);
-                        const white = color === "white" ? user_id : already_joined[0]!.user_id;
-                        const black = white === user_id ? already_joined[0]!.user_id : user_id;
-                        GameManager.get_instance().add_game
-                        ({
-                            game_id: room_id,
+                if(user.type === "PLAYER" && room_size <2){
+                    subscription_id = `${game_id}:play`;
+                    if(room_size === 1){
+                        const already_joined_player = RedisSubscriptionManager.get_instance().get_room_members(subscription_id)[0]!;
+                        const white = already_joined_player.color === "white" ? already_joined_player.user_id : user.user_id;
+                        const black = already_joined_player.user_id === white ? user.user_id : already_joined_player.user_id;
+                        GameManager.get_instance().add_game({
+                            game_id,
                             white,
                             black
                         })
                     }
-                }
-                else if(type === "SPECTATOR"){
-                    room_opcode = `${room_id}_watch`;
+
+                   
+                    RedisSubscriptionManager.get_instance().subscribe({
+                        room_id: subscription_id,
+                        client:{
+                            ws,
+                            id: client_count.toString(),
+                            user_id: user.user_id,
+                            color: user.color
+                        }
+                    })
                 }
                 else{
-                    throw new Error("Invalid type of message");
+                    RedisSubscriptionManager.get_instance().subscribe({
+                        room_id: subscription_id,
+                        client:{
+                            ws,
+                            id: client_count.toString(),
+                            user_id: user.user_id
+                        }
+                    })
                 }
 
-                assert(room_opcode !== undefined);
-
-                ws_clients = {...ws_clients,[client_count]:{
-                    room_id: room_opcode,
+                ws_clients[client_count] = {
                     ws,
-                    user_id
-                }}
-                
-                RedisSubscriptionManager.get_instance().subscribe({
-                    room_id: room_opcode,
-                    client:{
-                        id:client_count.toString(),
-                        ws,
-                        user_id,
-                    }
-                })
-                break;
-            case "PLAY":
-                const move = data.move;
-                const resp = GameManager.get_instance().make_move({
-                    game_id: room_id,
-                    move,
-                })
-                if(resp !== undefined && typeof resp !== "string"){
-                    RedisSubscriptionManager.get_instance().message({
-                        room_id:`${room_id}_watch`,
-                        payload: resp.after
-                    });
-                    RedisSubscriptionManager.get_instance().message({
-                        room_id:`${room_id}_play`,
-                        payload: resp.after
-                    })
+                    room_id: subscription_id,
+                    user_id: user.user_id
                 }
-                else{
-                    RedisSubscriptionManager.get_instance().message({
-                        room_id:`${room_id}_play`,
-                        payload: resp ?? "error occured"
-                    })
-                }
+
                 break;
+            }
         }
     })
     ws.on("close",()=>{

@@ -7,7 +7,8 @@ import type WebSocket from "ws";
 type Client = {
     ws: WebSocket,
     id: string,
-    user_id: string
+    user_id: string,
+    color?: "black"| "white"
 }
 
 export class RedisSubscriptionManager {
@@ -20,7 +21,8 @@ export class RedisSubscriptionManager {
     private reverse_subscription: Map<string, Record<string, {
         ws: WebSocket,
         id: string,
-        user_id: string
+        user_id: string,
+        color?: "black" | "white"
     }>>;
 
     private constructor() {
@@ -60,7 +62,7 @@ export class RedisSubscriptionManager {
             user_id: client.user_id
         }});
 
-        const room_size = Object.keys(this.reverse_subscription.get(room_id) ?? {}).length;
+        const room_size = this.get_room_size(room_id);
 
         if(room_size == 1){
 
@@ -87,8 +89,8 @@ export class RedisSubscriptionManager {
         client: Client
     }){
         if(this.subscriptions.has(client.id)){
-            let rooms_joined = this.subscriptions.get(client.id)!;
-            let remaining_rooms = rooms_joined.filter((id)=>room_id !== id);
+            const rooms_joined = this.subscriptions.get(client.id)!;
+            const remaining_rooms = rooms_joined.filter((id)=>room_id !== id);
 
             if(remaining_rooms.length == 0)
                 this.subscriptions.delete(client.id);
@@ -121,7 +123,8 @@ export class RedisSubscriptionManager {
     get_room_members(room_id: string){
         const clients = this.reverse_subscription.get(room_id) ?? {};
         const members = Object.values(clients).map((client)=>({
-            user_id: client.user_id
+            user_id: client.user_id,
+            color: client.color
         }));
 
         return members;
