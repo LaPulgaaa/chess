@@ -63,10 +63,10 @@ export class RedisSubscriptionManager {
         const room_size = Object.keys(this.reverse_subscription.get(room_id) ?? {}).length;
 
         if(room_size == 1){
-            const updated_clients_in_room = this.reverse_subscription.get(room_id);
-            assert(updated_clients_in_room !== undefined, "Room should have one client at this point");
 
            this.subscriber.subscribe(room_id, (payload)=>{
+            const updated_clients_in_room = this.reverse_subscription.get(room_id);
+            assert(updated_clients_in_room !== undefined, "Room should have one client at this point");
             // this callback executes everytime message is "PUBLISHED" to channel
             // `room_id`
             try{
