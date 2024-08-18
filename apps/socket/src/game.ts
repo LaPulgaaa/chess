@@ -27,14 +27,26 @@ export function create_game(game_id: string,already_joined_player: Player, joine
 }
 
 export function handle_move(incoming_data: PlayerMoveIncomingData){
-    const resp = GameManager.get_instance().make_move({
-        game_id: incoming_data.game_id,
-        move: incoming_data.move
-    });
+    const game = GameManager.get_instance().get_game(incoming_data.game_id);
 
-    if(resp !== undefined && typeof resp !== "string"){
-        return resp.after;
+    if(game === undefined)
+        return undefined;
+
+    try{
+        const resp = game.chess.move(incoming_data.move);
+        const is_game_over = game.chess.isGameOver();
+        // Doing DB stuff here.
+
+        const outgoing_data = {
+            after: resp.after,
+            from: resp.from,
+            to: resp.to,
+            over: is_game_over,
+            turn: game.chess.turn()
+        }
+        return JSON.stringify(outgoing_data);
+    }catch(err){
+        console.log(err);
+        return "INVALID MOVE";
     }
-
-    return resp;
 }

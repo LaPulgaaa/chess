@@ -34,19 +34,17 @@ export class GameManager{
         }}
     }
 
-    public make_move({game_id, move}:{game_id: string, move: string}): Move | undefined | string{
+    public get_game(game_id : string){
         const game = this.game_record[game_id];
 
         if(game === undefined)
             return undefined;
 
-        try{
-            const resp = game.chess.move(move);
-            return resp;
-        }catch(err){
-            console.log(err);
-            return "Invalid"
-        }
+        return game;
+    }
+
+    public remove_game(game_id: string){
+        delete this.game_record[game_id];
     }
 
     public get_board(game_id: string): string | undefined {
