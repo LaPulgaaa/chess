@@ -41,6 +41,7 @@ model User {
 
   @@unique([email])
   @@unique([username])
+  @@index([rating])
 }
 
 // We declare the password model separately to avoid leaking 
