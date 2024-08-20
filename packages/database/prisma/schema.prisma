@@ -9,3 +9,93 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Color {
+  WHITE
+  BLACK
+}
+
+enum Result {
+  LOST
+  WON
+  DRAW
+}
+
+enum GameStatus {
+  ABONDONED
+  ENDED
+  IN_PROGRESS
+  TIMED_OUT
+  PLAYER_EXIT
+}
+
+model User {
+  id String @id @default(uuid())
+  username String?
+  password Password?
+  name String?
+  rating Int @default(0)
+  email String?
+  createdAt DateTime @default(now())
+  player Player[]
+
+  @@unique([email])
+  @@unique([username])
+}
+
+// We declare the password model separately to avoid leaking 
+// user's password hash
+model Password {
+  hash String
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id String 
+
+  @@unique([user_id])
+}
+
+model Player {
+  id String @id @default(cuid())
+  color Color
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  game Game @relation(fields: [gameId], references: [uid], onDelete: Cascade)
+  gameId String
+  finishedGame Boolean @default(false)
+  result Result @default(DRAW)
+  moves Move[]
+  gameToken String @db.Text
+
+  @@unique([userId,gameId])
+  @@unique([color,gameId])
+  @@index([userId])
+}
+
+model Game {
+  id Int @id @default(autoincrement())
+  uid String 
+  players Player[]
+  createdAt DateTime @default(now())
+  startedAt DateTime?
+  endedAt DateTime?
+  metadata Json?
+  moves Move[]
+  plays String[]
+  currentState String @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  status GameStatus
+
+  @@unique([uid])
+  @@index([status])
+}
+
+model Move {
+  id String @id @default(cuid())
+  game Game @relation(fields: [gameId],references: [uid])
+  gameId String
+  beforeState String
+  afterState String
+  move String
+  playedAt DateTime @default(now())
+  playedBy Player @relation(fields: [playerId],references: [id])
+  playerId String
+  desc String?
+}
