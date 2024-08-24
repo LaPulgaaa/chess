@@ -18,6 +18,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@repo/prisma":"*",
     "@eslint/js": "^9.9.0",
     "@repo/typescript-config": "*",
     "@types/minimalistic-assert": "^1.0.3",

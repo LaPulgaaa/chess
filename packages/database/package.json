@@ -14,5 +14,8 @@
   },
   "devDependencies": {
     "prisma":"^5.18.0"
+  },
+  "exports":{
+    ".":"./src/index.ts"
   }
 }
