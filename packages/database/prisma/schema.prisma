@@ -22,6 +22,7 @@ enum Result {
 }
 
 enum GameStatus {
+  NOT_STARTED
   ABONDONED
   ENDED
   IN_PROGRESS
