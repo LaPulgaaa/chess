@@ -4,6 +4,7 @@ import WebSocket from "ws";
 import { RedisSubscriptionManager } from "./room_manager";
 import * as game from "./game";
 import type { Player, PlayerMoveIncomingData } from "./game";
+import { start_queue_worker } from "./worker";
 
 const WebSocketServer = WSSocketServer || WebSocket.Server;
 
@@ -28,13 +29,14 @@ export type IncomingClientData = {
 
 const ws_clients:WsClients = {};
 let client_count = 0;
+start_queue_worker();
 
 wss.on("connection",(ws)=>{
 
     client_count += 1;
     console.log("connection made")
 
-    ws.on("message",(raw_data)=>{
+    ws.on("message", async(raw_data)=>{
         const incoming_data: IncomingClientData = JSON.parse(`${raw_data}`);
         const {type} = incoming_data;
         const {game_id} = incoming_data;
@@ -89,7 +91,7 @@ wss.on("connection",(ws)=>{
             case "MOVE" : {
                 const move = incoming_data.move;
                 const player = incoming_data.user;
-                const resp = game.handle_move({
+                const resp = await game.handle_move({
                     type: "MOVE" as const,
                     game_id,
                     user: player,
