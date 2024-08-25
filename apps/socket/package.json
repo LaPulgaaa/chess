@@ -18,6 +18,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@repo/types":"*",
     "@repo/prisma":"*",
     "@eslint/js": "^9.9.0",
     "@repo/typescript-config": "*",

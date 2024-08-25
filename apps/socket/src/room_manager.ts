@@ -3,13 +3,7 @@ import assert from "minimalistic-assert";
 import { createClient } from "redis";
 import type { RedisClientType } from "redis";
 import type WebSocket from "ws";
-
-type Client = {
-    ws: WebSocket,
-    id: string,
-    user_id: string,
-    color?: "black"| "white"
-}
+import { Client } from "@repo/types";
 
 export class RedisSubscriptionManager {
     private static instance:RedisSubscriptionManager;

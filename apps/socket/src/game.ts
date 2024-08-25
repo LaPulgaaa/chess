@@ -1,7 +1,7 @@
-import { GameManager } from "./game_manager";
 import type { Square } from "chess.js";
 
-export type Color = "white" | "black";
+import { GameManager } from "./game_manager";
+import type {Color} from "@repo/types";
 
 export type Player = {
     type: "PLAYER",
