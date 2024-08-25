@@ -44,6 +44,12 @@ async function handle_popped_data(payload: RedisQueuePayload){
                 data: player_data
             })
         }
+        else if(payload.type === "Game"){
+            const game_data = payload.data;
+            await prisma.game.create({
+                data: game_data
+            })
+        }
     }catch(err){
         console.log(err);
         client.lPush("db",JSON.stringify(payload));

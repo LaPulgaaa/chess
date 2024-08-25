@@ -18,7 +18,7 @@ export type PlayerMoveIncomingData = {
     move: Square,
 }
 
-export function create_game(game_id: string,already_joined_player: Player, joined_now: Player){
+export async function create_game(game_id: string,already_joined_player: Player, joined_now: Player){
     const white = already_joined_player.color === "white" ? already_joined_player.user_id : joined_now.user_id;
     const black = already_joined_player.user_id === white ? joined_now.user_id : already_joined_player.user_id;
     try{
@@ -27,6 +27,18 @@ export function create_game(game_id: string,already_joined_player: Player, joine
             white,
             black
         });
+
+        const queue_payload: RedisQueuePayload = {
+            type: "Game" as const,
+            data: {
+                uid: game_id,
+                createdAt: new Date().toUTCString(),
+                plays: [],
+                status: "NOT_STARTED",
+                currentState: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            }
+        };
+        await client.lPush("db",JSON.stringify(queue_payload));
     }catch(err){
         console.log(err);
     }

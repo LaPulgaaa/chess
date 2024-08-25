@@ -7,6 +7,15 @@ export const match_result_schema = z.enum(["LOST","WON","DRAW"]);
 
 export const color_schema = z.enum(["WHITE","BLACK"]);
 
+export const game_status_schema = z.enum([
+    "NOT_STARTED",
+    "ABONDONED",
+    "ENDED",
+    "IN_PROGRESS",
+    "TIMED_OUT",
+    "PLAYER_EXIT"
+]);
+
 export const move_popped_data_schema = z.object({
     gameId: z.string(),
     move: z.string(),
@@ -26,6 +35,16 @@ export const player_popped_data_schema = z.object({
     gameToken: z.string(),
 });
 
+export const game_popped_data_schema = z.object({
+    uid: z.string(),
+    createdAt: z.string().datetime({ offset: true}),
+    startedAt: z.string().datetime({offset: true}).optional(),
+    plays: z.array(z.string()),
+    currentState: z.string(),
+    status: game_status_schema,
+    metadata: z.record(z.string()).optional(),
+});
+
 export const redis_queue_payload_schema = z.discriminatedUnion("type",[
     z.object({
         type: z.literal("Move"),
@@ -34,7 +53,11 @@ export const redis_queue_payload_schema = z.discriminatedUnion("type",[
     z.object({
         type: z.literal("Player"),
         data: player_popped_data_schema
-    })
+    }),
+    z.object({
+        type: z.literal("Game"),
+        data: game_popped_data_schema,
+    }),
 ]);
 
 // ---- types ----
