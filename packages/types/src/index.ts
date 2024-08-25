@@ -5,7 +5,7 @@ import type WebSocket from "ws";
 
 export const match_result_schema = z.enum(["LOST","WON","DRAW"]);
 
-export const color_schema = z.enum(["WHITE","BLACK"])
+export const color_schema = z.enum(["WHITE","BLACK"]);
 
 export const move_popped_data_schema = z.object({
     gameId: z.string(),
@@ -24,7 +24,7 @@ export const player_popped_data_schema = z.object({
     finishedGame: z.boolean(),
     result: match_result_schema,
     gameToken: z.string(),
-})
+});
 
 export const redis_queue_payload_schema = z.discriminatedUnion("type",[
     z.object({
@@ -35,7 +35,7 @@ export const redis_queue_payload_schema = z.discriminatedUnion("type",[
         type: z.literal("Player"),
         data: player_popped_data_schema
     })
-])
+]);
 
 // ---- types ----
 
@@ -44,7 +44,7 @@ export type Client = {
     id: string,
     user_id: string,
     color?: "black"| "white"
-}
+};
 
 export type Color = "white" | "black";
 
