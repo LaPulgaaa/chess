@@ -23,11 +23,24 @@ export type User = Player | {
 
 export type IncomingClientData = {
     type: "JOIN",
-    game_id: string,
-    user: User,
-} | PlayerMoveIncomingData;
+    username: string,
+} | PlayerMoveIncomingData | {
+    type: "INVITE",
+    host_uid: string,
+    invitee_uid: string,
+} | {
+    type: "PLAY",
+    game_uid: string,
+    player_uid: string,
+} | {
+    type: "LEAVE",
+};
 
-const ws_clients:WsClients = {};
+const inroom_clients:WsClients = {};
+export const online_clients: Record<number, {
+    ws: WebSocket,
+    username: string,
+}> = {};
 let client_count = 0;
 start_queue_worker();
 
@@ -37,94 +50,76 @@ wss.on("connection",(ws)=>{
     console.log("connection made")
 
     ws.on("message", async(raw_data)=>{
-        const incoming_data: IncomingClientData = JSON.parse(`${raw_data}`);
-        const {type} = incoming_data;
-        const {game_id} = incoming_data;
-
+        const data:IncomingClientData = JSON.parse(`${raw_data}`);
+        const type = data.type;
         switch(type){
-            case "JOIN":{
-                const user = incoming_data.user;
-                const room_size = RedisSubscriptionManager.get_instance().get_room_size(game_id);
-                let subscription_id = `${game_id}:watch`;
-                if(user.type === "PLAYER" && room_size <2){
-                    subscription_id = `${game_id}:play`;
-                    if(room_size === 1){
-                        const already_joined = RedisSubscriptionManager.get_instance().get_room_members(subscription_id)[0]!;
-                        const already_joined_player = {
-                            type: "PLAYER" as const,
-                            user_id: already_joined.user_id,
-                            color: already_joined.color!
-                        }
-                        game.create_game(game_id,already_joined_player,user);
-                    }
-
-                   
-                    RedisSubscriptionManager.get_instance().subscribe({
-                        room_id: subscription_id,
-                        client:{
-                            ws,
-                            id: client_count.toString(),
-                            user_id: user.user_id,
-                            color: user.color
-                        }
-                    })
-                }
-                else{
-                    RedisSubscriptionManager.get_instance().subscribe({
-                        room_id: subscription_id,
-                        client:{
-                            ws,
-                            id: client_count.toString(),
-                            user_id: user.user_id
-                        }
-                    })
-                }
-
-                ws_clients[client_count] = {
+            case "JOIN": {
+                const username = data.username;
+                online_clients[client_count] = {
                     ws,
-                    room_id: subscription_id,
-                    user_id: user.user_id
-                }
-
+                    username,
+                };
                 break;
             }
-            case "MOVE" : {
-                const move = incoming_data.move;
-                const player = incoming_data.user;
-                const resp = await game.handle_move({
-                    type: "MOVE" as const,
-                    game_id,
-                    user: player,
-                    move,
-                });
-                if(resp !== undefined){
-                    RedisSubscriptionManager.get_instance().message({
-                        room_id: `${game_id}:play`,
-                        payload: resp
-                    });
-                    RedisSubscriptionManager.get_instance().message({
-                        room_id: `${game_id}:watch`,
-                        payload: resp
-                    })
+            case "INVITE": {
+                const invitee = data.invitee_uid;
+                const may_be_online_invitee = Object.values(online_clients).find(({username})=> username === invitee);
+                if(may_be_online_invitee !== undefined){
+                    const invitee_ws = may_be_online_invitee.ws;
+                    invitee_ws.send(JSON.stringify({
+                        type: "INVITE",
+                        host: data.host_uid,
+                    }))
                 }
+                else {
+                    ws.send(JSON.stringify({
+                        type: "CHALLENGE",
+                        success: false,
+                    }))
+                }
+                break;
+            }
+            case "PLAY": {
+                const game_uid = data.game_uid;
+                const player_uid = data.player_uid;
+                RedisSubscriptionManager.get_instance().subscribe({
+                    room_id: game_uid,
+                    client: {
+                        user_id: player_uid,
+                        ws,
+                        id: client_count.toString(),
+                    }
+                })
+                inroom_clients[client_count] = {
+                    ws,
+                    user_id: player_uid,
+                    room_id: game_uid,
+                }
+            }
+            case "LEAVE": {
+                if(inroom_clients[client_count] !== undefined){
+                    const {room_id,user_id} = inroom_clients[client_count]!;
+                    const id = client_count.toString();
+                    RedisSubscriptionManager.get_instance().unsubscribe({
+                        room_id,
+                        client:{
+                            id,
+                            ws,
+                            user_id
+                        }
+                    });
+                }
+                break;
+            }
+            case "MOVE": {
+                
                 break;
             }
         }
     })
     ws.on("close",()=>{
-        if(ws_clients[client_count] !== undefined){
-            const {room_id,user_id} = ws_clients[client_count]!;
-            const id = client_count.toString();
-            RedisSubscriptionManager.get_instance().unsubscribe({
-                room_id,
-                client:{
-                    id,
-                    ws,
-                    user_id
-                }
-            });
-            delete ws_clients[client_count];
-            client_count -= 1;
+        if(online_clients[client_count] !== undefined){
+            delete online_clients[client_count];
         }
     })
 })
