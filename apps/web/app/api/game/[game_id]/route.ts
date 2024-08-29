@@ -12,13 +12,13 @@ export async function POST(
     const game_token = cookiesStore.get('game');
     try{
         const res = await prisma.$transaction(async(tx) => {
-            prisma.game.create({
+            tx.game.create({
                 data: {
                     uid: game_id,
                     status: "NOT_STARTED",
                 }
             })
-            const new_player_ids = await prisma.player.createManyAndReturn({
+            const new_player_ids = await tx.player.createManyAndReturn({
                 data:[
                     {
                         gameId: game_id,
