@@ -2,8 +2,10 @@ const base = require("@repo/config/tailwind-preset");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  ...base,
-  content: [...base.content],
-  plugins: [require("tailwindcss-animate")],
+    darkMode: ["class"],
+    ...base,
+  	content: [...base.content],
+	theme: {...base.theme},
+  	plugins: [require("tailwindcss-animate")],
 }
 
