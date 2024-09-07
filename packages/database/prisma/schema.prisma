@@ -37,8 +37,22 @@ model User {
   name String?
   rating Int @default(0)
   email String?
+  appTheme String?
+  emailVerified DateTime?
+  avatar String?
+  provider Provider @default(GOOGLE)
+  providerId String?
+  refreshToken String?
+  accessToken String?
+  expiresAt Int?
+  tokenType String?
+  scope String?
+  idToken String?
+  sessionState String?
+
   createdAt DateTime @default(now())
   player Player[]
+  sessions Session[]
 
   @@unique([email])
   @@unique([username])
@@ -67,6 +81,8 @@ model Player {
   moves Move[]
   gameToken String @db.Text
 
+  accessToken String?
+  
   @@unique([userId,gameId])
   @@unique([color,gameId])
   @@index([userId])
@@ -100,4 +116,19 @@ model Move {
   playedBy Player @relation(fields: [playerId],references: [id])
   playerId String
   desc String?
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Provider {
+  GITHUB
+  GOOGLE
 }
