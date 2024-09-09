@@ -5,7 +5,7 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
 export default function Navbar(){
     return (
-        <header className="sticky top-0 z-full w-full backdrop-blur">
+        <div className="sticky top-0 z-full w-full backdrop-blur">
             <div className="container flex justify-between h-14 max-w-screen-2xl items-center mt-1">
                 <div className="mr-4 flex">
                     <Link 
@@ -25,6 +25,6 @@ export default function Navbar(){
                     </a>
                 </div>
             </div>
-        </header>
+        </div>
     )
 }

@@ -1,7 +1,8 @@
 import Image from "next/image";
-
+import { redirect } from "next/navigation";
 import { Button } from "@repo/ui";
 import board from "@/public/dark-mode.jpg";
+import Link from "next/link";
 
 
 export default function Home() {
@@ -18,7 +19,7 @@ export default function Home() {
             </h1>
           </div>
           <div className="flex justify-center">
-          <Button className="mx-6">Play</Button>
+          <Link href={"/signin"}><Button className="mx-6">Play</Button></Link>
           <Button
           className="mx-6"
           variant={"secondary"}>Watch</Button>

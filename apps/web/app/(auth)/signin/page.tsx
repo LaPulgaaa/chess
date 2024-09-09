@@ -1,7 +1,10 @@
 'use client'
 import Image from "next/image";
+import Link from "next/link";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { redirect, useRouter } from "next/navigation";
+
+import { signIn } from "next-auth/react";
 
 import { Button } from "@repo/ui";
 
@@ -34,13 +37,6 @@ export default function Login(){
                     </div>
                     <div className="grid gap-6">
                         <Button
-                        onClick={async()=>{
-                            
-                        }}
-                        >
-                            <GitHubLogoIcon className="mr-3 h-4"/> GitHub
-                        </Button>
-                        <Button
                         className=""
                         onClick={async()=>{
                             
@@ -51,10 +47,13 @@ export default function Login(){
                             alt="google"
                             width={24}
                             height={24}
-                            className="pr-4"
+                            className="pr-[4px] mr-[4px]"
                             />
                             Google
                         </Button>
+                    </div>
+                    <div>
+                        <Link href="/signup">Don't have an account?</Link>
                     </div>
                 </div>
             </div>

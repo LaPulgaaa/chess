@@ -60,6 +60,17 @@ export const redis_queue_payload_schema = z.discriminatedUnion("type",[
     }),
 ]);
 
+export const user_signin_form_schema = z.object({
+    username: z.string({required_error:"Username is a required field"}).min(6,{
+        message: "Username should be atleast 6 digits",
+    }),
+    email: z.string({required_error: "Email is a required field"})
+        .email({message: "Invalid email address"}),
+    password: z.string()
+        .min(10,{message: "Password should be between 10-12 characters"})
+        .max(12,{message: "Can not be more than 12 characters"})
+});
+
 // ---- types ----
 
 export type Client = {
