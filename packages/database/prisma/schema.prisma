@@ -52,6 +52,7 @@ model User {
 
   createdAt DateTime @default(now())
   player Player[]
+  friends Friend[]
   sessions Session[]
 
   @@unique([email])
@@ -67,6 +68,16 @@ model Password {
   user_id String 
 
   @@unique([user_id])
+}
+
+model Friend {
+  id Int @id() @default(autoincrement())
+
+  userId String
+  matches Int[]
+  won Int[]
+  lastMatchPlayed DateTime?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Player {
