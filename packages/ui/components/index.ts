@@ -5,3 +5,4 @@ export * from "./theme-provider";
 export * from "./label";
 export * from "./form";
 export * from "./input";
+export * from "./checkbox";

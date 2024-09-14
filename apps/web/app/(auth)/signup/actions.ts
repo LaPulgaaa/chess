@@ -2,9 +2,9 @@
 
 import prisma from "@repo/prisma";
 import { z } from "zod";
-import { user_signin_form_schema } from "@repo/types";
+import { user_signup_form_schema } from "@repo/types";
 
-type FormData = z.infer<typeof user_signin_form_schema>;
+type FormData = z.infer<typeof user_signup_form_schema>;
 
 export const is_username_taken = async(username: string) => {
     try{
@@ -17,12 +17,13 @@ export const is_username_taken = async(username: string) => {
             }
         });
 
-        if(possible_username === null)
+        if(possible_username !== null)
             return true;
         else 
             return false;
     }catch(err){
         console.log(err);
+        return true;
     }
 }
 

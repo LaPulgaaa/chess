@@ -3,9 +3,15 @@ import { redirect } from "next/navigation";
 import { Button } from "@repo/ui";
 import board from "@/public/dark-mode.jpg";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
 
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession();
+
+  if(session !== null)
+    redirect("/home");
+  
   return (
     <div className="flex flex-col lg:flex-row items-center justify-between m-36">
       <div className="flex flex-col justify-between p-12">

@@ -1,8 +1,7 @@
 import type { NextAuthOptions, SessionStrategy } from "next-auth";
-import { CallbacksOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-
 import prisma from "@repo/prisma";
+import { JWT } from "next-auth/jwt";
 
 export const auth_options:NextAuthOptions = {
     providers:[
@@ -15,35 +14,43 @@ export const auth_options:NextAuthOptions = {
                 password: {label: "Password", type: "password", placeholder: "Your super secret password"}
             },
             async authorize(credentials){
-                if(!credentials)
-                {
-                    console.error("For some reason credentials are missing");
-                    throw new Error("Something broke!")
+                if(!credentials){
+                    throw new Error("Credentials unavailable");
                 }
 
-                const user = await prisma.user.findUnique({
-                    where: {
-                        username: credentials.email,
+                const existing_user = await prisma.user.findUnique({
+                    where:{
+                        email: credentials.email,
+                    },
+                    select:{
+                        id: true,
+                        email: true,
+                        username: true,
+                        name: true,
+                        avatar: true,
                     }
                 });
 
-                if(user === null){
-                    throw new Error("User not found!!");
+                if(!existing_user){
+                    throw new Error("User not found");
                 }
 
                 const password = await prisma.password.findUnique({
-                    where: {
-                        user_id: user.id,
+                    where:{
+                        user_id: existing_user.id,
+                    },
+                    select:{
+                        hash: true,
                     }
                 });
 
-                if(password === null){
-                    throw new Error("Can not verify password");
+                if(credentials.password !== password?.hash)
+                {
+                    throw new Error("User not found");
                 }
 
                 return {
-                    ...user,
-                    id: user.id
+                    ...existing_user
                 }
             }
         }),
@@ -56,8 +63,47 @@ export const auth_options:NextAuthOptions = {
         strategy: "jwt" as SessionStrategy
     },
     callbacks: {
-        async session(params: Parameters<CallbacksOptions["session"]>[0]){
-            return {id: params.token.sub, ...params.session};
+        async jwt({
+            token,
+            trigger,
+            session,
+            user,
+            account
+        }){
+            if(trigger === "update"){
+                return {
+                    ...token,
+                    email: session?.email ?? token.email,
+                    username: session?.username ?? token.username,
+                    name: session?.name ?? token.name,
+                    avatar: session?.avatar ?? token.picture,
+                } as JWT;
+            }
+
+            if(!account){
+                return {
+                    ...token,
+                } as JWT;
+            }
+
+            if(account.type === "credentials"){
+                return {
+                    ...token,
+                    email: user.email,
+                    //@ts-ignore
+                    username: user.username,
+                    name: user.name,
+                    avatar: user.image,
+                } as JWT;
+            }
+
+            return token;
+        },
+        async session({session,token,}){
+            return {
+                ...session,
+                ...token
+            }
         }
     }
 }

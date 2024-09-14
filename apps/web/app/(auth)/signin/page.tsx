@@ -1,17 +1,42 @@
 'use client'
-import Image from "next/image";
-import Link from "next/link";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { redirect, useRouter } from "next/navigation";
 
+import { z } from "zod";
+
+import { useRouter } from "next/navigation";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { user_signin_form_schema } from "@repo/types";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@repo/ui";
+import { Input } from "@repo/ui";
+import { Button } from "@repo/ui";
 import { signIn } from "next-auth/react";
 
-import { Button } from "@repo/ui";
-
-import GoogleIcon from "@/public/google.svg";
+type FormValue = z.output<typeof user_signin_form_schema>;
 
 export default function Login(){
+
     const router = useRouter();
+
+    const form_methods = useForm<FormValue>({
+        resolver: zodResolver(user_signin_form_schema),
+        defaultValues: {
+            email: "",
+            password: "",   
+        }
+    });
+
+    const onSubmit:SubmitHandler<FormValue> = async (credentials: FormValue) => {
+        const resp = await signIn<"credentials">("credentials",{
+            ...credentials,
+            redirect: false
+        });
+
+        if(resp && resp.ok){
+            router.push("/home")
+        }
+    }
+
+    const {control, handleSubmit, formState:{isDirty, isLoading, isSubmitting}} = form_methods;
 
     return (
         <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow mx-4 mt-8">
@@ -30,31 +55,58 @@ export default function Login(){
                     </blockquote>
                 </div>
             </div>
-            <div className="lg:p-8">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                    <div className="flex flex-col space-y-2 text-center">
-                        <h1 className="text-2xl font-semibold tracking-tight">Login to your account</h1>
+            <div className="mx-auto h-full flex flex-col justify-center w-full sm:w-[350px] space-y-6">
+                <div className="w-full py-24 px-8 bg-zinc-900 w-full md:w-[440px] px-4 rounded-md">
+                    <div className="flex flex-col space-y-2 text-center mb-4">
+                        <h1 className="text-2xl font-semibold tracking-tight">Welcome back!</h1>
                     </div>
-                    <div className="grid gap-6">
-                        <Button
-                        className=""
-                        onClick={async()=>{
-                            
-                        }}
-                        >
-                            <Image
-                            src={GoogleIcon}
-                            alt="google"
-                            width={24}
-                            height={24}
-                            className="pr-[4px] mr-[4px]"
-                            />
-                            Google
-                        </Button>
+                    <div className="">
+                        <div className="">
+                        <Form {...form_methods}>
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <FormField
+                                control={control}
+                                name="email"
+                                render={({field})=>(
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="johndoe@domain.com" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={control}
+                                name="password"
+                                render={({field})=>(
+                                    <FormItem>
+                                        <FormLabel>Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                            type="password"
+                                            placeholder="*********" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                                />
+                                <Button
+                                disabled = {
+                                    !isDirty ||
+                                    isSubmitting || 
+                                    isLoading 
+                                } 
+                                className="w-full mt-8"
+                                type="submit">
+                                    Sign in
+                                </Button>
+                            </form>
+                        </Form>
+                        </div>
                     </div>
-                    <div>
-                        <Link href="/signup">Don't have an account?</Link>
-                    </div>
+                    
                 </div>
             </div>
             </div>
