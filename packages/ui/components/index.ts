@@ -6,3 +6,4 @@ export * from "./label";
 export * from "./form";
 export * from "./input";
 export * from "./checkbox";
+export * from "./avatar";
