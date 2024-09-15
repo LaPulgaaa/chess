@@ -7,3 +7,6 @@ export * from "./form";
 export * from "./input";
 export * from "./checkbox";
 export * from "./avatar";
+export * from "./dialog";
+export * from "./command";
+export * from "./scrollarea";
