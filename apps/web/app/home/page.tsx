@@ -2,9 +2,10 @@
 
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
-import prisma from "@repo/prisma";
 import { getServerSession } from "next-auth";
+import { HistoryIcon, ListVideoIcon, Users, Users2 } from "lucide-react";
 
 import knight from "@/public/knight.png"
 import { 
@@ -20,8 +21,17 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuTrigger, 
-    ScrollArea} from "@repo/ui";
-import { HistoryIcon, ListVideoIcon, NetworkIcon, Users, Users2 } from "lucide-react";
+    ScrollArea,
+    TableCaption,
+    Table,
+    TableHeader,
+    TableRow,
+    TableHead
+} from "@repo/ui";
+import prisma from "@repo/prisma";
+
+import { get_matches } from "./actions";
+
 
 export async function get_details(email: string | null | undefined){
     if(email === null || email === undefined)
@@ -73,6 +83,7 @@ export default async function Home(){
         redirect("/");
 
     const user_details = await get_details(session.user.email);
+    const my_matches = await get_matches(session.user.email!);
 
     if(user_details === null || user_details === undefined)
         redirect("/");
@@ -99,7 +110,7 @@ export default async function Home(){
     ]
 
     return(
-        <div className="mx-48 my-12">
+        <div className="mx-36 my-12 space-y-12">
             <div className="flex justify-between">
                 <div className="flex mx-8">
                     <Avatar>
@@ -127,12 +138,12 @@ export default async function Home(){
                                         {
                                             user_details.friends.map(({user})=>{
                                                 return (
-                                                    <CommandItem key={user.username}>
-                                                        <Avatar>
-                                                            <AvatarImage src={user.avatar ?? ""}/>
-                                                            <AvatarFallback>{user.username.substring(0,2)}</AvatarFallback>
-                                                        </Avatar>
-                                                    </CommandItem>
+                                                <CommandItem key={user.username}>
+                                                    <Avatar>
+                                                        <AvatarImage src={user.avatar ?? ""}/>
+                                                        <AvatarFallback>{user.username.substring(0,2)}</AvatarFallback>
+                                                    </Avatar>
+                                                </CommandItem>
                                                 )
                                             })
                                         }
@@ -143,13 +154,13 @@ export default async function Home(){
                     </DropdownMenu>
                 </div>
             </div>
-            <div className="hidden md:flex justify-between my-4 ml-8">
+            <div className="hidden md:flex flex-col items-center lg:flex-row md:justify-center my-4 ">
                 {
                     player_history.map((figure)=>{
                         return(
                             <div
                             key={figure.key}
-                            className="flex flex-col mx-2 border-[0.5px] rounded-md p-6 w-1/5 hover:bg-zinc-900 transition duration-300 ease-in-out">
+                            className="flex flex-col m-2 border-[0.5px] rounded-md p-6 w-[248px] dark:hover:bg-zinc-900 transition duration-300 ease-in-out">
                                 <div className="flex justify-between">
                                 <small className="text-sm font-medium leading-none">{figure.title}</small>
                                 <div className="text-muted-foreground pb-2"><HistoryIcon/></div>
@@ -164,26 +175,48 @@ export default async function Home(){
                     })
                 }
             </div>
-            <div className="flex m-24">
-                <div className="flex flex-col space-y-8">
-                    <Button className="p-8" size={"lg"}>
+            <div className="md:flex flex-col items-center lg:flex-row md:justify-center mt-12 md:space-x-24 space-y-12">
+                <div className="flex flex-col space-y-4 mx-8 w-1/2">
+                <Link href={"/play/online"} className="flex">
+                    <Button
+                    className="p-8 w-full" size={"lg"}>
                         <Image src={knight} alt="knight" style={{width:"24px"}}/>
-                        <span className="ml-2">Play Online</span>
+                        <span className="ml-2">Play online</span>
                     </Button>
-                    <Button className="p-8" size={"lg"}>
+                </Link>
+                <Link href={"/"} className="flex">
+                    <Button className="p-8 w-full" size={"lg"}>
                         <Users/>
                         <span className="ml-2">Play a Friend</span>
                     </Button>
-                    <Button className="p-8" size={"lg"}>
+                </Link>
+                <Link href={"/"} className="flex">
+                    <Button className="p-8 w-full" size={"lg"}>
                         <ListVideoIcon/>
                         <span className="ml-2">Watch live</span>
                     </Button>
+                </Link>
                 </div>
-                <div>
-                    <ScrollArea className="h-auto">
-
+                <div className="rounded-md border-2 w-3/4 h-[320px]">
+                    <ScrollArea className="">
+                        <div className="flex flex-col items-center pt-12">No active matches..</div>
                     </ScrollArea>
                 </div>
+            </div>
+            <div>
+                <Table className="rounded-md border-2">
+                    <TableCaption>
+                        A list of matches played.
+                    </TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Players</TableHead>
+                            <TableHead>Result</TableHead>
+                            <TableHead>Moves</TableHead>
+                            <TableHead>Date</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                </Table>
             </div>
         </div>
     )

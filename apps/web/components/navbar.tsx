@@ -10,7 +10,7 @@ export default function Navbar(){
                     <Link 
                     className="mr-4 flex items-center space-x-2 lg:mr-6"
                     href="/">
-                        <span className="hidden italic lg:inline-block font-bold">play/ Chess</span>
+                        <span className="italic font-bold">play/ Chess</span>
                     </Link>
                 </div>
                 <div className="flex">
