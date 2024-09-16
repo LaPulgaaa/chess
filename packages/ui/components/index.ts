@@ -10,3 +10,6 @@ export * from "./avatar";
 export * from "./dialog";
 export * from "./command";
 export * from "./scrollarea";
+export * from "./toast";
+export * from "./toaster";
+export * from "./use-toast";
