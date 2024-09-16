@@ -1,21 +1,25 @@
 'use client'
 
-import { z } from "zod";
-
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+import { z } from "zod";
+import { signIn } from "next-auth/react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { user_signin_form_schema } from "@repo/types";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@repo/ui";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, ToastAction } from "@repo/ui";
 import { Input } from "@repo/ui";
 import { Button } from "@repo/ui";
-import { signIn } from "next-auth/react";
+import { useToast } from "@repo/ui";
 
 type FormValue = z.output<typeof user_signin_form_schema>;
 
 export default function Login(){
 
     const router = useRouter();
+    const {toast} = useToast();
 
     const form_methods = useForm<FormValue>({
         resolver: zodResolver(user_signin_form_schema),
@@ -26,13 +30,27 @@ export default function Login(){
     });
 
     const onSubmit:SubmitHandler<FormValue> = async (credentials: FormValue) => {
-        const resp = await signIn<"credentials">("credentials",{
-            ...credentials,
-            redirect: false
-        });
+        try{
+            const resp = await signIn<"credentials">("credentials",{
+                ...credentials,
+                redirect: false
+            });
+    
+            if(resp && resp.ok){
+                router.push("/home")
+            }
 
-        if(resp && resp.ok){
-            router.push("/home")
+            else{
+                toast({
+                    variant: "destructive",
+                    title: "Signin failed!!",
+                    description: "Please check your creds.",
+                    action: <ToastAction altText="Try Again">Try Again</ToastAction>
+                });
+
+            }
+        }catch(err){
+
         }
     }
 
@@ -60,7 +78,7 @@ export default function Login(){
                     <div className="flex flex-col space-y-2 text-center mb-4">
                         <h1 className="text-2xl font-semibold tracking-tight">Welcome back!</h1>
                     </div>
-                    <div className="">
+                    <div className="flex flex-col ">
                         <div className="">
                         <Form {...form_methods}>
                             <form onSubmit={handleSubmit(onSubmit)}>
@@ -104,6 +122,12 @@ export default function Login(){
                                 </Button>
                             </form>
                         </Form>
+                        </div>
+                        <br/>
+                        <div className="flex justify-center mt-4 hover:underline underline-offset-2">
+                            <Link href={"/signup"}>
+                                <p>Don't have an account?</p>
+                            </Link>
                         </div>
                     </div>
                     
