@@ -1,6 +1,5 @@
 import Board from "./board";
 
-
 export default function Online(){
     const fen = "rnbqkbnr/pppp1ppp/8/4p3/4PP2/8/PPPP2PP/RNBQKBNR b KQkq - 0 2";
     return(
