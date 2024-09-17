@@ -135,6 +135,9 @@ export default function Board({fen}:{fen: string}){
                     if(elem){
                         if(op === "SET")
                         {
+                            if(move.includes("x"))
+                            elem.style.backgroundColor = DARK_CAPTURE;
+                            else
                             elem.style.backgroundColor = DARK_POSSIBLE;
                         }
                         else
