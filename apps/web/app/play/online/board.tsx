@@ -1,6 +1,10 @@
+'use client'
+
+import { MouseEvent, useRef} from "react";
+
 import Image, { StaticImageData } from "next/image";
 
-import { Chess } from "chess.js";
+import { Chess, Square, PieceSymbol, Color } from "chess.js";
 
 // white pieces
 import wr from "@/public/wr.png";
@@ -37,27 +41,53 @@ const piece_store:PieceStore = {
     bp: bp,
 };
 
+type Board = ({
+    square: Square;
+    type: PieceSymbol;
+    color: Color;
+} | null)[][];
+
 export default function Board({fen}:{fen: string}){
     const chess = new Chess();
     const board = chess.board();
 
-    function find_ind(a:number,b:number){
-        return a+b;
+    const board_ref = useRef<HTMLDivElement>(null);
+
+    function find_ind(row :number, col :number){
+        return row+col;
     }
 
+    function assign_id(row: number, col: number){
+        let square: string = "";
+        let row_id: string = (8-row).toString();
+        let col_id: string = String.fromCharCode(97+col);
+        return row_id+col_id;
+    }
+
+    function handleClick(e:MouseEvent){}
+        
+
     return(
-        <div className="">
+        <div 
+        ref={board_ref}
+        className="">
             {
                 board.map((row,row_no)=>{
                     return(
-                        <div className="flex">
+                        <div
+                        key={row_no} 
+                        className="flex">
                             {
                                 row.map((sq,col_no)=>{
                                     return(
-                                        <span className="flex flex-row">
+                                        <span
+                                        key={assign_id(row_no,col_no)}
+                                        className="flex flex-row">
                                             {
-                                                <span 
-                                                className = {`${find_ind(row_no,col_no) %2 == 0 ? "bg-[#f0d9b5]" : "bg-[#b58863]"} relative  h-[100px] w-[100px] border-2`}>
+                                                <span
+                                                onClick={handleClick}
+                                                id={assign_id(row_no,col_no)}
+                                                className = {`${find_ind(row_no,col_no) %2 == 0 ? "dark:bg-[#b0bec5] bg-[#f0d9b5]" : "dark:bg-[#37474f] bg-[#b58863]"} relative  h-[100px] w-[100px] border-2`}>
                                                     {
                                                         sq && <Image
                                                         className="absolute"
