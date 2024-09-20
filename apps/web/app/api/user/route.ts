@@ -8,7 +8,7 @@ export async function POST(req: Request){
         const user = await prisma.$transaction(async(tx)=>{
             const new_user = await tx.user.create({
                 data:{
-                    username: data.username,
+                    username: data.email,
                     email: data.email
                 }
             });
