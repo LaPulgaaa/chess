@@ -74,6 +74,9 @@ model Friend {
   id Int @id() @default(autoincrement())
 
   userId String
+  username String
+  avatar String?
+  email String
   matches Int[]
   won Int[]
   lastMatchPlayed DateTime?
