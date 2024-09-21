@@ -12,17 +12,19 @@ export class SignallingManager {
     private initialised: boolean = false;
     private id: number;
     private back_off_interval: number;
+    private username: string;
 
-    private constructor(){
+    private constructor(username: string){
         this.back_off_interval = 0;
         this.ws = new WebSocket("ws://localhost:8080");
         this.id = 1;
+        this.username = username;
         this.init_ws();
     }
 
-    public static get_instance() {
+    public static get_instance(username?: string) {
         if(!SignallingManager.instance){
-            SignallingManager.instance = new SignallingManager();
+            SignallingManager.instance = new SignallingManager(username!);
         }
 
         return SignallingManager.instance;
@@ -54,13 +56,15 @@ export class SignallingManager {
                 this.init_ws();
             },this.back_off_interval)
         }
+
+        this.CONNECT()
     }
 
-    CONNECT(username: string){
+    private CONNECT(){
         const message = JSON.stringify({
             type: "JOIN",
             payload: {
-                username,
+                username: this.username,
             },
         })
 
@@ -102,6 +106,8 @@ export class SignallingManager {
                 id: this.id++,
                 message,
             })
+
+            return;
         }
 
         this.ws.send(message);
