@@ -52,7 +52,7 @@ export async function search_users_by_creds(creds: string, client_email: string,
             orderBy: {
                 rating: "desc"
             },
-            take: 10
+        take: 10
         });
 
         return resp;
