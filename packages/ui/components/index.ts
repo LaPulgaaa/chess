@@ -15,3 +15,5 @@ export * from "./toaster";
 export * from "./use-toast";
 export * from "./table";
 export * from "./badge";
+export * from "./toggle";
+export * from "./toggle-group";
