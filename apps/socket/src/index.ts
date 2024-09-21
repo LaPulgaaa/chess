@@ -29,8 +29,11 @@ export type IncomingClientData = {
 } | PlayerMoveIncomingData | {
     type: "INVITE",
     payload: {
+        game_id: string,
         host_uid: string,
+        host_avatar: string,
         invitee_uid: string,
+        host_color: "w" | "b" | "r"
     }
 } | {
     type: "PLAY",
@@ -74,13 +77,21 @@ wss.on("connection",(ws)=>{
                     const invitee_ws = may_be_online_invitee.ws;
                     invitee_ws.send(JSON.stringify({
                         type: "INVITE",
-                        host: data.payload.host_uid,
+                        data: JSON.stringify({
+                            host_uid: data.payload.host_uid,
+                            host_color: data.payload.host_color,
+                            host_avatar: data.payload.host_avatar,
+                            game_id: data.payload.game_id
+                        })
                     }))
                 }
                 else {
                     ws.send(JSON.stringify({
                         type: "CHALLENGE",
-                        success: false,
+                        data: JSON.stringify({
+                            success: false,
+                            invitee
+                        })
                     }))
                 }
                 break;

@@ -4,6 +4,14 @@ type BufferedMessage = {
     message: string,
 }
 
+export type InviteMessage = {
+    invitee_uid: string,
+    host_uid: string,
+    game_id: string,
+    host_color: "w" | "b" | "r",
+    host_avatar: string,
+}
+
 export class SignallingManager {
     private static instance: SignallingManager;
     private ws: WebSocket;
@@ -39,7 +47,7 @@ export class SignallingManager {
         }
 
         this.ws.onmessage = (event) =>{
-            const payload = JSON.parse(`${event}`);
+            const payload = JSON.parse(`${event.data}`);
             const type: string = payload.type;
             const data: string = payload.data;
 
@@ -87,13 +95,16 @@ export class SignallingManager {
         delete this.callbacks[type];
     }
 
-    INVITE(invitee_uid: string, host_uid: string, game_id: string){
+    INVITE(data: InviteMessage){
+        const { game_id, invitee_uid, host_avatar, host_color, host_uid } = data;
         const message = JSON.stringify({
             type: "INVITE",
             payload: {
                 game_id,
                 invitee_uid,
                 host_uid,
+                host_color,
+                host_avatar
             },
         })
 
