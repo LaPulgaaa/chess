@@ -35,7 +35,7 @@ model User {
   username String
   password Password?
   name String?
-  rating Int @default(0)
+  rating Int @default(100)
   email String
   appTheme String?
   emailVerified DateTime?
