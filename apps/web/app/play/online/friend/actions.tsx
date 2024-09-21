@@ -28,15 +28,17 @@ export async function get_friends(email: string){
     }
 }
 
-export async function search_users_by_creds(creds: string){
+export async function search_users_by_creds(creds: string, client_email: string, client_username: string){
     try{
         const resp = await prisma.user.findMany({
             where: {
                 username: {
                     contains: creds,
+                    not: client_username
                 },
                 email: {
                     contains: creds,
+                    not: client_email
                 }
             },
             select:{
@@ -49,7 +51,8 @@ export async function search_users_by_creds(creds: string){
             },
             orderBy: {
                 rating: "desc"
-            }
+            },
+            take: 10
         });
 
         return resp;
