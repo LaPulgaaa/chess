@@ -31,6 +31,7 @@ import {
 import prisma from "@repo/prisma";
 
 import { get_matches } from "./actions";
+import Connect from "./connect";
 
 
 export async function get_details(email: string | null | undefined){
@@ -218,6 +219,7 @@ export default async function Home(){
                     </TableHeader>
                 </Table>
             </div>
+            <Connect/>
         </div>
     )
 }

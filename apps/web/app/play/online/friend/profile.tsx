@@ -1,22 +1,31 @@
+'use client'
+
 import Image from "next/image";
+
+import { QuestionMarkIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useSession } from "next-auth/react";
 
 import { 
     Avatar,
     AvatarFallback,
     AvatarImage,
     Button,
-    DialogContent,
+    DialogClose,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
-    DialogTitle, 
-    ToggleGroup,
-    ToggleGroupItem
+    DialogTitle,
+    toast, 
 } from "@repo/ui";
 
 import wk from "@/public/wk.png";
 import bk from "@/public/bk.png";
-import { QuestionMarkIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
+
+import { SignallingManager } from "@/lib/singleton/signal_manager";
+import type { InviteMessage } from "@/lib/singleton/signal_manager";
+
 
 type Profile = {
     username: string;
@@ -27,13 +36,45 @@ type Profile = {
     createdAt: Date;
 };
 
+type ChallengeCallbackData = {
+    success: boolean,
+    invitee: string,
+}
 
 export default function Profile(profile:Profile){
     const [color, setColor] = useState<"w" | "b" | "r">("w");
+    const session = useSession();
 
-    function send_request(){
-        console.log(color);
+    function challenge_callback(data: string){
+        const { success, invitee }: ChallengeCallbackData = JSON.parse(data);
+        if(success === false){
+            toast({
+                variant: "destructive",
+                title: "Challenge not accepted!",
+                description: `${invitee} is currently offline!`
+            })
+        }
     }
+
+
+    function send_request(invitee: string){
+        if(session.status === "authenticated"){
+            const game_id = uuidv4();
+            const data:InviteMessage = {
+                game_id,
+                invitee_uid: invitee,
+                //@ts-ignore
+                host_uid: session.data.username,
+                host_color: color,
+                host_avatar: "",
+            };
+            //@ts-ignore
+            SignallingManager.get_instance(session.data.username).INVITE(data);
+            SignallingManager.get_instance().REGISTER_CALLBACK("CHALLENGE", challenge_callback)
+        }
+        
+    }
+
     return (
         <span>
             <DialogHeader>
@@ -82,11 +123,15 @@ export default function Profile(profile:Profile){
                 </div>
                 </div>
                 <div className="w-full">
-                    <Button
-                    onClick={send_request}
-                    className="w-full" size={"lg"}>
-                        Play
-                    </Button>
+                    <DialogFooter className="sm:justify-start">
+                        <DialogClose asChild>
+                            <Button
+                            onClick={()=>send_request(profile.username)}
+                            className="w-full" size={"lg"}>
+                                Play
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
                 </div>
             </div>
         </span>
