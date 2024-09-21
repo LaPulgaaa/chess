@@ -23,15 +23,21 @@ export type User = Player | {
 
 export type IncomingClientData = {
     type: "JOIN",
-    username: string,
+    payload: {
+        username: string,
+    }
 } | PlayerMoveIncomingData | {
     type: "INVITE",
-    host_uid: string,
-    invitee_uid: string,
+    payload: {
+        host_uid: string,
+        invitee_uid: string,
+    }
 } | {
     type: "PLAY",
-    game_uid: string,
-    player_uid: string,
+    payload: {
+        game_uid: string,
+        player_uid: string,
+    }
 } | {
     type: "LEAVE",
 };
@@ -54,7 +60,7 @@ wss.on("connection",(ws)=>{
         const type = data.type;
         switch(type){
             case "JOIN": {
-                const username = data.username;
+                const username = data.payload.username;
                 online_clients[client_count] = {
                     ws,
                     username,
@@ -62,13 +68,13 @@ wss.on("connection",(ws)=>{
                 break;
             }
             case "INVITE": {
-                const invitee = data.invitee_uid;
+                const invitee = data.payload.invitee_uid;
                 const may_be_online_invitee = Object.values(online_clients).find(({username})=> username === invitee);
                 if(may_be_online_invitee !== undefined){
                     const invitee_ws = may_be_online_invitee.ws;
                     invitee_ws.send(JSON.stringify({
                         type: "INVITE",
-                        host: data.host_uid,
+                        host: data.payload.host_uid,
                     }))
                 }
                 else {
@@ -80,8 +86,8 @@ wss.on("connection",(ws)=>{
                 break;
             }
             case "PLAY": {
-                const game_uid = data.game_uid;
-                const player_uid = data.player_uid;
+                const game_uid = data.payload.game_uid;
+                const player_uid = data.payload.player_uid;
                 RedisSubscriptionManager.get_instance().subscribe({
                     room_id: game_uid,
                     client: {
