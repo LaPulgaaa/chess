@@ -95,7 +95,7 @@ export default function Board({fen}:{fen: string}){
             //@ts-ignore
             const possible_moves = GameManager.get_instance().get_moves(from);
 
-            if(possible_moves){
+            if(possible_moves && from !== to){
                 GameManager.get_instance().make_move(from,to);
                 setBoard(GameManager.get_instance().get_board());
             }
