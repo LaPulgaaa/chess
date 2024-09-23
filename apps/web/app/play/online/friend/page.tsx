@@ -15,9 +15,9 @@ export default async function Friend(){
 
     const friends = await get_friends(session.user?.email!);
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 m-12">
+        <div className="flex lg:flex-row flex-col justify-between m-12 space-x-2">
             <Board fen={""}/>
-            <div className="flex w-full flex-col items-center dark:bg-zinc-900 bg-orange-100">
+            <div className="w-full flex flex-col items-center dark:bg-zinc-900 bg-orange-100 mt-4">
                 <div className="flex space-x-2 justify-center mt-4">
                     <HandshakeIcon className="mt-2 mr-2"/>
                     <h3 className="text-2xl font-semibold tracking-tight">

@@ -161,7 +161,7 @@ export default function Board({fen}:{fen: string}){
     return(
         <div 
         ref={board_ref}
-        className="w-full">
+        className="w-full mt-4">
             {
                 board.map((row,row_no)=>{
                     return(
