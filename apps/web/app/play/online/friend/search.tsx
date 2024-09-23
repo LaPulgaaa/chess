@@ -48,11 +48,11 @@ export default function Search(){
                 {
                     results && results.map((result)=>{
                         return (
-                            <Dialog>
+                            <Dialog key={result.username}>
                                 <DialogTrigger asChild>
                                 <div 
                                 className="flex space-x-4 p-2 m-2 cursor-pointer"
-                                key={result.username}>
+                                >
                                     <Avatar
                                     className="rounded-none"
                                     >
