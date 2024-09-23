@@ -183,7 +183,7 @@ export default function Board({fen}:{fen: string}){
                                                 }}
                                                 onClick={handleClick}
                                                 id={assign_id(row_no,col_no)}
-                                                className = {`${find_ind(row_no,col_no) %2 == 0 ? "dark:bg-[#b0bec5] bg-[#f0d9b5]" : "dark:bg-[#37474f] bg-[#b58863]"} relative  h-[100px] w-[100px] border-2`}>
+                                                className = {`${find_ind(row_no,col_no) %2 == 0 ? "dark:bg-[#b0bec5] bg-[#f0d9b5]" : "dark:bg-[#37474f] bg-[#b58863]"} relative  md:h-[100px] md:w-[100px] border-2 h-[80px] w-[80px]`}>
                                                     {
                                                         sq && <Image
                                                         className="absolute"
