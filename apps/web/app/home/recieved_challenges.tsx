@@ -1,0 +1,58 @@
+'use client'
+
+import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { challenges } from "@repo/store"
+import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui";
+import { Badge } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { useRecoilState } from "recoil"
+
+export default function RecievedChallenge(){
+    const [recieved_challenges,setRecieved_Challenges] = useRecoilState(challenges);
+
+    function refuse_challenge(toremove_gid: string){
+        const left_challenges = recieved_challenges.filter((c)=>c.game_id !== toremove_gid);
+        setRecieved_Challenges([...left_challenges]);
+    }
+
+
+    return(
+        <div className="w-full px-6 mt-4">
+            <div className="flex">
+                <p>Challenges</p>
+                <Badge className="ml-1" variant={"secondary"}>{recieved_challenges?.length ?? 0}</Badge>
+            </div>
+            <div className="space-y-2 mt-2">
+                {
+                    recieved_challenges ? recieved_challenges.map((challenge)=>{
+                        return (
+                            <div 
+                            key={challenge.game_id}
+                            className="flex space-x-2 justify-between">
+                                <div className="flex space-x-2">
+                                    <Avatar className="rounded-none">
+                                        <AvatarImage
+                                        className="rounded-none"
+                                        src={challenge.host_avatar ?? ""}/>
+                                        <AvatarFallback
+                                        className="rounded-none"
+                                        >{challenge.host_uid.substring(0,2)}</AvatarFallback>
+                                    </Avatar>
+                                    <p className="mt-2">{challenge.host_uid}</p>
+                                </div>
+                                <div className="flex justify-between space-x-2">
+                                    <Button 
+                                    className = {`${challenge.host_color === "w" ? "bg-black text-white": "bg-white text-black"}`}
+                                    variant={"outline"} size={"icon"}><CheckIcon/></Button>
+                                    <Button 
+                                    onClick={()=>refuse_challenge(challenge.game_id)}
+                                    variant={"destructive"} size={"icon"}><Cross1Icon/></Button>
+                                </div>
+                            </div>
+                        )
+                    }) : <></>
+                }
+            </div>
+        </div>
+    )
+}

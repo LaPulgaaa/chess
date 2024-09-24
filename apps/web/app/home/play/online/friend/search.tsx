@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { search_users_by_creds } from "./actions";
 import Profile from "./profile";
 import { useSession } from "next-auth/react";
+import RecievedChallenge from "@/app/home/recieved_challenges";
 
 type Result = {
     username: string;
@@ -79,6 +80,7 @@ export default function Search(){
                     })
                 }
             </div>
+            <RecievedChallenge/>
         </div>
     )
 }
