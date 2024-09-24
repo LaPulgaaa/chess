@@ -2,7 +2,6 @@ import { WebSocketServer as WSSocketServer }from "ws";
 import WebSocket from "ws";
 
 import { RedisSubscriptionManager } from "./room_manager";
-import * as game from "./game";
 import type { Player, PlayerMoveIncomingData } from "./game";
 import { start_queue_worker } from "./worker";
 
@@ -55,8 +54,7 @@ start_queue_worker();
 
 wss.on("connection",(ws)=>{
 
-    client_count += 1;
-    console.log("connection made")
+    const ws_id = client_count++;
 
     ws.on("message", async(raw_data)=>{
         const data:IncomingClientData = JSON.parse(`${raw_data}`);
@@ -64,7 +62,7 @@ wss.on("connection",(ws)=>{
         switch(type){
             case "JOIN": {
                 const username = data.payload.username;
-                online_clients[client_count] = {
+                online_clients[ws_id] = {
                     ws,
                     username,
                 };
@@ -135,8 +133,9 @@ wss.on("connection",(ws)=>{
         }
     })
     ws.on("close",()=>{
-        if(online_clients[client_count] !== undefined){
-            delete online_clients[client_count];
+        if(online_clients[ws_id]){
+            console.log(online_clients[ws_id]?.username + "just went offline");
+            delete online_clients[ws_id];
         }
     })
 })

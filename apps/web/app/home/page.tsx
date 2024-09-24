@@ -178,14 +178,14 @@ export default async function Home(){
             </div>
             <div className="md:flex flex-col items-center lg:flex-row md:justify-center mt-12 md:space-x-24 space-y-12">
                 <div className="flex flex-col space-y-4 mx-8 w-1/2">
-                <Link href={"/play/online/random"} className="flex">
+                <Link href={"/home/play/online/random"} className="flex">
                     <Button
                     className="p-8 w-full" size={"lg"}>
                         <Image src={knight} alt="knight" style={{width:"24px"}}/>
                         <span className="ml-2">Play online</span>
                     </Button>
                 </Link>
-                <Link href={"/play/online/friend"} className="flex">
+                <Link href={"/home/play/online/friend"} className="flex">
                     <Button className="p-8 w-full" size={"lg"}>
                         <Users/>
                         <span className="ml-2">Play a Friend</span>
@@ -219,7 +219,6 @@ export default async function Home(){
                     </TableHeader>
                 </Table>
             </div>
-            <Connect/>
         </div>
     )
 }

@@ -9,7 +9,7 @@ export const client = createClient();
 export async function start_queue_worker(){
     try{
         await client.connect();
-
+        console.log("Queue worker ready....");
         while(true){
             try{
                 const resp = await client.brPop("db",0);

@@ -36,26 +36,9 @@ type Profile = {
     createdAt: Date;
 };
 
-type ChallengeCallbackData = {
-    success: boolean,
-    invitee: string,
-}
-
 export default function Profile(profile:Profile){
     const [color, setColor] = useState<"w" | "b" | "r">("w");
     const session = useSession();
-
-    function challenge_callback(data: string){
-        const { success, invitee }: ChallengeCallbackData = JSON.parse(data);
-        if(success === false){
-            toast({
-                variant: "destructive",
-                title: "Challenge not accepted!",
-                description: `${invitee} is currently offline!`
-            })
-        }
-    }
-
 
     function send_request(invitee: string){
         if(session.status === "authenticated"){
@@ -70,7 +53,6 @@ export default function Profile(profile:Profile){
             };
             //@ts-ignore
             SignallingManager.get_instance(session.data.username).INVITE(data);
-            SignallingManager.get_instance().REGISTER_CALLBACK("CHALLENGE", challenge_callback)
         }
         
     }
