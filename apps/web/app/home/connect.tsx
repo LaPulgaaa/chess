@@ -24,7 +24,7 @@ export default function Connect(){
 
     function recieve_challenge_callbacks(raw_data: string){
         const data:ChallengeRecieved = JSON.parse(raw_data);
-        const host_color = data.host_color === "w" ? "white" : "black";
+        const host_color = data.host_color === "w" ? "black" : "white";
         setMyChallenges((challenges) => [...challenges,data]);
         toast({
             title: "You recieved a challenge",
