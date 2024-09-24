@@ -5,6 +5,7 @@ import { ThemeProvider } from "@repo/ui";
 import Navbar from "../components/navbar";
 import { AuthProvider } from "@/components/auth_provider";
 import { Toaster } from "@repo/ui";
+import RecoilContextProvider from "@/components/recoil_provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,11 +35,13 @@ export default function RootLayout({
         enableSystem
         disableTransitionOnChange
         >
-          <AuthProvider>
-            <Navbar/>
-            {children}
-            <Toaster/>
-          </AuthProvider>
+          <RecoilContextProvider>
+            <AuthProvider>
+              <Navbar/>
+              {children}
+              <Toaster/>
+            </AuthProvider>
+          </RecoilContextProvider>
         </ThemeProvider>
       </body>
     </html>

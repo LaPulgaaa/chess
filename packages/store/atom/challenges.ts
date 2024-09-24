@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-type ChallengeRecieved = {
+export type ChallengeRecieved = {
     host_uid: string,
     host_color: string,
     host_avatar: string,
