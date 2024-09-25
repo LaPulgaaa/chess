@@ -61,7 +61,21 @@ export default function Connect(){
                 description: `${invitee.uid} accepted your challenge`
             });
 
-            SignallingManager.get_instance().PLAY(game_id, host.uid, host.color);
+            const message = JSON.stringify({
+                type: "PLAY",
+                payload: {
+                    game_id,
+                    host: {
+                        color: host.color,
+                        uid: host.uid
+                    },
+                    invitee: {
+                        color: invitee.color,
+                        uid: invitee.uid
+                    }
+                }
+            });
+            SignallingManager.get_instance().PLAY(message);
         }
     }
 

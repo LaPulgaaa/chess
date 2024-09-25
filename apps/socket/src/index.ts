@@ -4,6 +4,7 @@ import WebSocket from "ws";
 import { RedisSubscriptionManager } from "./room_manager";
 import type { Player, PlayerMoveIncomingData } from "./game";
 import { start_queue_worker } from "./worker";
+import { create_game } from "./utils";
 
 const WebSocketServer = WSSocketServer || WebSocket.Server;
 
@@ -52,8 +53,14 @@ export type IncomingClientData = {
     type: "PLAY",
     payload: {
         game_id: string,
-        player_uid: string,
-        player_color: "w" | "b",
+        host: {
+            uid: string,
+            color: "w" | "b"
+        },
+        invitee: {
+            uid: string,
+            color: "w" | "b"
+        }
     }
 } | {
     type: "LEAVE",
@@ -153,25 +160,21 @@ wss.on("connection",(ws)=>{
             }
             case "PLAY": {
                 const game_id = data.payload.game_id;
-                const player_uid = data.payload.player_uid;
                 
                 RedisSubscriptionManager.get_instance().subscribe({
                     room_id: game_id,
                     client: {
-                        user_id: player_uid,
+                        user_id: data.payload.host.uid,
                         ws: ws,
                         id: ws_id.toString(),
-                        color: data.payload.player_color
+                        color: data.payload.host.color,
                     }
                 })
-                RedisSubscriptionManager.get_instance().message({
-                    room_id: game_id,
-                    payload: JSON.stringify({
-                        type: "GAME_START",
-                        data: "fen",
-                        game_id
-                    })
-                })
+
+                const userb = data.payload.host.color === "b" ? data.payload.host.uid : data.payload.invitee.uid;
+                const userw = data.payload.host.color === "w" ? data.payload.host.uid : data.payload.invitee.uid;
+                
+                await create_game(game_id,userw,userb);
             }
             case "LEAVE": {
                 if(inroom_clients[client_count] !== undefined){
