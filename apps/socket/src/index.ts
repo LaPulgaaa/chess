@@ -72,7 +72,7 @@ export const online_clients: Record<number, {
     username: string,
 }> = {};
 let client_count = 0;
-// start_queue_worker();
+start_queue_worker();
 
 wss.on("connection",(ws)=>{
 
