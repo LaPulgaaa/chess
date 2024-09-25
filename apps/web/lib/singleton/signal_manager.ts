@@ -111,6 +111,23 @@ export class SignallingManager {
         this.handle_send(message);
     }
 
+    CHALLENGE(data: string){
+        this.handle_send(data);
+    }
+
+    PLAY(game_id: string, player_uid: string,player_color: "w" | "b"){
+        const message = JSON.stringify({
+            type: "PLAY",
+            payload: {
+                game_id,
+                player_uid,
+                player_color
+            }
+        });
+
+        this.handle_send(message);
+    }
+
     private handle_send(message: string){
         if(!this.initialised){
             this.buffered_message.push({

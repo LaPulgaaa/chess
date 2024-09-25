@@ -11,9 +11,20 @@ import { SignallingManager } from "@/lib/singleton/signal_manager";
 import { ToastAction, useToast } from "@repo/ui";
 
 type ChallengeCallbackData = {
-    success: boolean,
-    invitee: string,
-}
+    success: false,
+    invitee: string
+} | ({
+    success: true,
+    host: {
+        uid: string,
+        color: "w" | "b",
+    },
+    invitee: {
+        uid: string,
+        color: "w" | "b"
+    },
+    game_id: string,
+})
 
 export default function Connect(){
     const session = useSession();
@@ -33,14 +44,24 @@ export default function Connect(){
         })
     }
 
-    function send_challenge_callback(data: string){
-        const { success, invitee }: ChallengeCallbackData = JSON.parse(data);
-        if(success === false){
+    function send_challenge_callback(raw_data: string){
+        const data:ChallengeCallbackData = JSON.parse(raw_data);
+        if(data.success === false){
+            const invitee = data.invitee;
             toast({
                 variant: "destructive",
                 title: "Challenge not accepted!",
                 description: `${invitee} is currently offline!`
             })
+        }
+        else{
+            const {host, invitee, game_id} = data;
+            toast({
+                title: "Challenge Accepted",
+                description: `${invitee.uid} accepted your challenge`
+            });
+
+            SignallingManager.get_instance().PLAY(game_id, host.uid, host.color);
         }
     }
 

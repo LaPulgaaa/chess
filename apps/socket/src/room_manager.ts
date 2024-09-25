@@ -20,10 +20,10 @@ export class RedisSubscriptionManager {
     }>>;
 
     private constructor() {
-        this.publisher = createClient();
-        this.publisher.connect();
         this.subscriber= createClient();
         this.subscriber.connect();
+        this.publisher = createClient();
+        this.publisher.connect();
         this.subscriptions = new Map();
         this.reverse_subscription = new Map();
     }
@@ -59,7 +59,6 @@ export class RedisSubscriptionManager {
         const room_size = this.get_room_size(room_id);
 
         if(room_size == 1){
-
            this.subscriber.subscribe(room_id, (payload)=>{
             const updated_clients_in_room = this.reverse_subscription.get(room_id);
             assert(updated_clients_in_room !== undefined, "Room should have one client at this point");
@@ -67,7 +66,7 @@ export class RedisSubscriptionManager {
             // `room_id`
             try{
 
-                Object.values(updated_clients_in_room).forEach(({ws})=>{
+                Object.values(this.reverse_subscription.get(room_id) ?? {}).forEach(({ws,user_id})=>{
                     ws.send(payload);
                 })
 

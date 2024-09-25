@@ -84,7 +84,7 @@ export type Client = {
     ws: WebSocket,
     id: string,
     user_id: string,
-    color?: "black"| "white"
+    color?: "b"| "w"
 };
 
 export type Color = "white" | "black";

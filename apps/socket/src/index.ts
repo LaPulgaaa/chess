@@ -35,10 +35,25 @@ export type IncomingClientData = {
         host_color: "w" | "b" | "r"
     }
 } | {
+    type: "CHALLENGE",
+    payload: {
+        game_id: string,
+        accept: boolean,
+        host: {
+            uid: string,
+            color: "w" | "b",
+        },
+        invitee: {
+            uid: string,
+            color: "w" | "b"
+        }
+    }
+} | {
     type: "PLAY",
     payload: {
-        game_uid: string,
+        game_id: string,
         player_uid: string,
+        player_color: "w" | "b",
     }
 } | {
     type: "LEAVE",
@@ -50,7 +65,7 @@ export const online_clients: Record<number, {
     username: string,
 }> = {};
 let client_count = 0;
-start_queue_worker();
+// start_queue_worker();
 
 wss.on("connection",(ws)=>{
 
@@ -94,22 +109,69 @@ wss.on("connection",(ws)=>{
                 }
                 break;
             }
+            case "CHALLENGE":{
+                const was_challenge_accepted = data.payload.accept;
+                const invitee = data.payload.invitee;
+                const host = data.payload.host;
+                const maybe_online_invitee = Object.values(online_clients).find(
+                    ({ username }) => username === invitee.uid
+                );
+                const maybe_online_host = Object.values(online_clients).find(
+                    ({ username }) => username === host.uid
+                );
+                if(was_challenge_accepted === true && maybe_online_host && maybe_online_invitee){
+
+                    maybe_online_host.ws.send(JSON.stringify({
+                        type: "CHALLENGE",
+                        data: JSON.stringify({
+                            success: true,
+                            host: {
+                                uid: data.payload.host.uid,
+                                color: data.payload.host.color
+                            },
+                            invitee: {
+                                uid: data.payload.invitee.uid,
+                                color: data.payload.invitee.color
+                            },
+                            game_id: data.payload.game_id,
+                        })
+                    }));
+
+                    RedisSubscriptionManager.get_instance().subscribe({
+                        room_id: data.payload.game_id,
+                        client: {
+                            user_id: data.payload.invitee.uid,
+                            ws: ws,
+                            id: ws_id.toString(),
+                            color: data.payload.invitee.color,
+                        }
+                    });
+
+                }
+                
+                break;
+            }
             case "PLAY": {
-                const game_uid = data.payload.game_uid;
+                const game_id = data.payload.game_id;
                 const player_uid = data.payload.player_uid;
+                
                 RedisSubscriptionManager.get_instance().subscribe({
-                    room_id: game_uid,
+                    room_id: game_id,
                     client: {
                         user_id: player_uid,
-                        ws,
-                        id: client_count.toString(),
+                        ws: ws,
+                        id: ws_id.toString(),
+                        color: data.payload.player_color
                     }
                 })
-                inroom_clients[client_count] = {
-                    ws,
-                    user_id: player_uid,
-                    room_id: game_uid,
-                }
+                RedisSubscriptionManager.get_instance().message({
+                    room_id: game_id,
+                    payload: JSON.stringify({
+                        type: "GAME_START",
+                        data: "fen",
+                        game_id
+                    })
+                })
             }
             case "LEAVE": {
                 if(inroom_clients[client_count] !== undefined){
