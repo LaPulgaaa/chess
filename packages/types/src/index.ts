@@ -90,3 +90,16 @@ export type Client = {
 export type Color = "white" | "black";
 
 export type RedisQueuePayload = z.output<typeof redis_queue_payload_schema>;
+
+export type GameStartCallbackData = {
+    game_id: string,
+    fen: string,
+    w: {
+        pid: string,
+        uid: string,
+    },
+    b: {
+        pid: string,
+        uid: string,
+    }
+}

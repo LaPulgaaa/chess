@@ -29,6 +29,10 @@ export class GameManager{
         }
     }
 
+    public reset_board(){
+        this.game.reset();
+    }
+
     public get_board(){
         return this.game.board();
     }

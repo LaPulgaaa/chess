@@ -1,11 +1,14 @@
 'use client'
 
-import { MouseEvent, useRef, useState} from "react";
-
+import { MouseEvent, useEffect, useRef, useState} from "react";
 import Image, { StaticImageData } from "next/image";
 
+import { useSession } from "next-auth/react";
 import type { Square, PieceSymbol, Color } from "chess.js";
 import { SQUARES } from "chess.js";
+
+import { GameStartCallbackData } from "@repo/types";
+import { board_orien, game_state } from "@repo/store";
 
 import { GameManager } from "@/lib/singleton/game_manager";
 
@@ -24,6 +27,10 @@ import bb from "@/public/bb.png";
 import bq from "@/public/bq.png";
 import bk from "@/public/bk.png";
 import bp from "@/public/bp.png";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { SignallingManager } from "@/lib/singleton/signal_manager";
+import { useToast } from "@repo/ui";
+
 
 type PieceWithColor = "wr" | "wn" | "wb" | "wq" | "wk" | "wp" | "br" | "bn" | "bb" | "bq" | "bk" | "bp";
 
@@ -66,9 +73,15 @@ type Board = ({
 } | null)[][];
 
 export default function Board({fen}:{fen: string}){
+    const session = useSession();
+
+    const { toast } = useToast();
+
     const [board, setBoard] = useState<Board>(GameManager.get_instance().get_board());
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
+    const setGameState = useSetRecoilState(game_state);
+    const [orient,setOrient] = useRecoilState(board_orien);
 
     const board_ref = useRef<HTMLDivElement>(null);
     let square_refs = useRef<Map<string, HTMLSpanElement | null>>(new Map());
@@ -156,12 +169,48 @@ export default function Board({fen}:{fen: string}){
             })
         });
     }
+
+    function start_game_callback(raw_data: string){
+        if(session.status === "authenticated"){
+            const data:GameStartCallbackData = JSON.parse(raw_data);
+
+            //@ts-ignore
+            const color = session.data.username === data.b.uid ? "b" : "w";
+            GameManager.get_instance().reset_board();
+            setBoard(GameManager.get_instance().get_board());
+            setGameState({
+                game_id: data.game_id,
+                color,
+                fen: data.fen
+            });
+            setOrient(color);
+            toast({
+                title: "Game Started"
+            })
+        }
+        else{
+            alert("Session expired")
+        }
+    }
     
+    useEffect(()=>{
+        if(session.status === "authenticated"){
+            //@ts-ignore
+            SignallingManager.get_instance(session.data.username).REGISTER_CALLBACK("GAME_START",start_game_callback);
+        }
+
+        return ()=>{
+            if(session.status === "authenticated"){
+                //@ts-ignore
+                SignallingManager.get_instance(session.data.username).DEREGISTER_CALLBACK("GAME_START");
+            }
+        }
+    })
 
     return(
         <div 
         ref={board_ref}
-        className="w-full mt-4">
+        className={`w-full mt-4 flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
             {
                 board.map((row,row_no)=>{
                     return(
