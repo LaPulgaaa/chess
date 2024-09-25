@@ -84,7 +84,7 @@ export async function create_game(game_id: string, userw: string, userb: string)
 
         const payload = {
             type: "GAME_START",
-            data: {
+            data: JSON.stringify({
                 game_id: game_id,
                 w: {
                     uid: userw,
@@ -95,7 +95,7 @@ export async function create_game(game_id: string, userw: string, userb: string)
                     pid: resp.b,
                 },
                 fen: resp.fen,
-            }
+            })
         }
 
         RedisSubscriptionManager.get_instance().message({
