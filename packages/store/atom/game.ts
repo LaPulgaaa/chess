@@ -1,12 +1,24 @@
-import { atom } from "recoil";
+import { atomFamily, selectorFamily } from "recoil";
 
-export type GameState = {
-    game_id: string,
-    fen: string,
-    color: "w" | "b"
-}
+import { LiveGameState } from "@repo/types";
 
-export const game_state = atom<GameState | undefined>({
-    key: "game_state",
-    default: undefined
-})
+export const live_games_store = atomFamily<LiveGameState[] | null, {user_id: string}>({
+    key: "games_store",
+    default: selectorFamily({
+        key: "get_games",
+        get: 
+        ({ user_id }:{ user_id: string }) => 
+            async ({get}) => {
+                try{
+                    const resp = await fetch(`/api/player/${user_id}`,{
+                        cache: "no-store"
+                    });
+                    const {data}:{data:LiveGameState[]} = await resp.json();
+                    return data;
+                }catch(err){
+                    console.log(err);
+                    return null;
+                }
+            }
+    })
+});
