@@ -3,9 +3,9 @@ import type WebSocket from "ws";
 
 // -- zod schemas ---
 
-export const match_result_schema = z.enum(["LOST","WON","DRAW"]);
+export const match_result_schema = z.enum(["LOST","WON","DRAW","NOT_DECIDED_YET"]);
 
-export const color_schema = z.enum(["WHITE","BLACK"]);
+export const color_schema = z.enum(["w","b"]);
 
 export const game_status_schema = z.enum([
     "NOT_STARTED",
