@@ -103,3 +103,12 @@ export type GameStartCallbackData = {
         uid: string,
     }
 }
+
+export type LiveGameState = {
+    game_id: string,
+    player_id: string,
+    fen: string,
+    plays: string[],
+    status: "NOT_STARTED" | "IN_PROGRESS" | "ENDED" | "ABONDONED" | "TIMED_OUT",
+    color: "w" | "b"
+}
