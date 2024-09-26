@@ -19,6 +19,7 @@ enum Result {
   LOST
   WON
   DRAW
+  NOT_DECIDED_YET
 }
 
 enum GameStatus {
@@ -91,7 +92,7 @@ model Player {
   game Game @relation(fields: [gameId], references: [uid], onDelete: Cascade)
   gameId String
   finishedGame Boolean @default(false)
-  result Result @default(DRAW)
+  result Result @default(NOT_DECIDED_YET)
   moves Move[]
   gameToken String @db.Text
 
