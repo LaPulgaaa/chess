@@ -11,8 +11,8 @@ datasource db {
 }
 
 enum Color {
-  WHITE
-  BLACK
+  w
+  b
 }
 
 enum Result {

@@ -50,13 +50,13 @@ export async function create_game(game_id: string, userw: string, userb: string)
                 data: [
                     {
                         userId: userw_id.id,
-                        color: "WHITE",
+                        color: "w",
                         gameId: new_game.uid,
                         gameToken: game_token
                     },
                     {
                         userId: userb_id.id,
-                        color: "BLACK",
+                        color: "b",
                         gameId: new_game.uid,
                         gameToken: game_token
                     }
