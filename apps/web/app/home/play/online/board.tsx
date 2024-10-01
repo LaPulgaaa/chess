@@ -7,8 +7,7 @@ import { useSession } from "next-auth/react";
 import type { Square, PieceSymbol, Color } from "chess.js";
 import { SQUARES } from "chess.js";
 
-import { GameStartCallbackData } from "@repo/types";
-import { board_orien, game_state } from "@repo/store";
+import { board_orien } from "@repo/store";
 
 import { GameManager } from "@/lib/singleton/game_manager";
 
@@ -80,7 +79,6 @@ export default function Board({fen}:{fen: string}){
     const [board, setBoard] = useState<Board>(GameManager.get_instance().get_board());
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
-    const setGameState = useSetRecoilState(game_state);
     const [orient,setOrient] = useRecoilState(board_orien);
 
     const board_ref = useRef<HTMLDivElement>(null);
@@ -169,43 +167,6 @@ export default function Board({fen}:{fen: string}){
             })
         });
     }
-
-    function start_game_callback(raw_data: string){
-        if(session.status === "authenticated"){
-            const data:GameStartCallbackData = JSON.parse(raw_data);
-
-            //@ts-ignore
-            const color = session.data.username === data.b.uid ? "b" : "w";
-            GameManager.get_instance().reset_board();
-            setBoard(GameManager.get_instance().get_board());
-            setGameState({
-                game_id: data.game_id,
-                color,
-                fen: data.fen
-            });
-            setOrient(color);
-            toast({
-                title: "Game Started"
-            })
-        }
-        else{
-            alert("Session expired")
-        }
-    }
-    
-    useEffect(()=>{
-        if(session.status === "authenticated"){
-            //@ts-ignore
-            SignallingManager.get_instance(session.data.username).REGISTER_CALLBACK("GAME_START",start_game_callback);
-        }
-
-        return ()=>{
-            if(session.status === "authenticated"){
-                //@ts-ignore
-                SignallingManager.get_instance(session.data.username).DEREGISTER_CALLBACK("GAME_START");
-            }
-        }
-    })
 
     return(
         <div 

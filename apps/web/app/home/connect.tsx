@@ -4,11 +4,14 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSetRecoilState } from "recoil";
 
-import {challenges} from "@repo/store";
+import {board_orien, challenges} from "@repo/store";
 import type { ChallengeRecieved } from "@repo/store";
+import type { GameStartCallbackData } from "@repo/types";
+import { ToastAction, useToast } from "@repo/ui";
 
 import { SignallingManager } from "@/lib/singleton/signal_manager";
-import { ToastAction, useToast } from "@repo/ui";
+import { useRouter } from "next/navigation";
+
 
 type ChallengeCallbackData = {
     success: false,
@@ -27,11 +30,22 @@ type ChallengeCallbackData = {
 })
 
 export default function Connect(){
+    const router = useRouter();
     const session = useSession();
     const { toast } = useToast();
     const setMyChallenges = useSetRecoilState<ChallengeRecieved[]>(challenges);
 
     const status = session.status;
+
+    function start_game_callback(raw_data: string){
+        const data:GameStartCallbackData = JSON.parse(raw_data);
+        toast({
+            duration: 5000,
+            draggable: true,
+            title: "Redirecting to new game..."
+        })
+        router.push(`/home/play/online/game/${data.game_id}`)
+    }
 
     function recieve_challenge_callbacks(raw_data: string){
         const data:ChallengeRecieved = JSON.parse(raw_data);
@@ -84,7 +98,8 @@ export default function Connect(){
             //@ts-ignore
             SignallingManager.get_instance(session.data.username);
             SignallingManager.get_instance().REGISTER_CALLBACK("INVITE",recieve_challenge_callbacks);
-            SignallingManager.get_instance().REGISTER_CALLBACK("CHALLENGE", send_challenge_callback)
+            SignallingManager.get_instance().REGISTER_CALLBACK("CHALLENGE", send_challenge_callback);
+            SignallingManager.get_instance().REGISTER_CALLBACK("GAME_START", start_game_callback);
         }
 
         return ()=>{
@@ -92,6 +107,7 @@ export default function Connect(){
                 //@ts-ignore
                 SignallingManager.get_instance(session.data.username).DEREGISTER_CALLBACK("INVITE");
                 SignallingManager.get_instance().DEREGISTER_CALLBACK("CHALLENGE");
+                SignallingManager.get_instance().DEREGISTER_CALLBACK("GAME_START");
             }
         }
     },[status])
