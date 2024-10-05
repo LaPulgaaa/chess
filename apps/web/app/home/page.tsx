@@ -32,7 +32,7 @@ import prisma from "@repo/prisma";
 
 import { get_matches } from "./actions";
 import Connect from "./connect";
-
+import LiveGames from "./live_games";
 
 export async function get_details(email: string | null | undefined){
     if(email === null || email === undefined)
@@ -106,7 +106,7 @@ export default async function Home(){
             key: 2,
             title: "Active Matches",
             icon: "",
-            detail: 0
+            detail: my_matches.filter((match) => match.status === "NOT_STARTED" || match.status === "IN_PROGRESS").length,
         }
     ]
 
@@ -199,8 +199,8 @@ export default async function Home(){
                 </Link>
                 </div>
                 <div className="rounded-md border-2 w-3/4 h-[320px]">
-                    <ScrollArea className="">
-                        <div className="flex flex-col items-center pt-12">No active matches..</div>
+                    <ScrollArea className="flex flex-col item-center">
+                        <LiveGames/>
                     </ScrollArea>
                 </div>
             </div>
