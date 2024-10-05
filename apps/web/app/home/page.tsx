@@ -31,7 +31,6 @@ import {
 import prisma from "@repo/prisma";
 
 import { get_matches } from "./actions";
-import Connect from "./connect";
 import LiveGames from "./live_games";
 
 export async function get_details(email: string | null | undefined){

@@ -1,6 +1,6 @@
 'use client'
 
-import { MouseEvent, useEffect, useRef, useState} from "react";
+import { MouseEvent, useRef, useState} from "react";
 import Image, { StaticImageData } from "next/image";
 
 import { useSession } from "next-auth/react";

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useSetRecoilState } from "recoil";
 
-import {board_orien, challenges} from "@repo/store";
+import { challenges } from "@repo/store";
 import type { ChallengeRecieved } from "@repo/store";
 import type { GameStartCallbackData } from "@repo/types";
 import { ToastAction, useToast } from "@repo/ui";
