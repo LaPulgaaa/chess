@@ -110,5 +110,9 @@ export type LiveGameState = {
     fen: string,
     plays: string[],
     status: "NOT_STARTED" | "IN_PROGRESS" | "ENDED" | "ABONDONED" | "TIMED_OUT",
-    color: "w" | "b"
+    color: "w" | "b",
+    opponent: {
+        username: string,
+        rating: string,
+    },
 }
