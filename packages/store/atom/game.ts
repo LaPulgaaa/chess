@@ -10,7 +10,7 @@ export const live_games_store = atomFamily<LiveGameState[] | null, {username: st
         ({ username }:{ username: string }) => 
             async ({get}) => {
                 try{
-                    const resp = await fetch(`/api/player/${username}`,{
+                    const resp = await fetch(`/api/player/live/${username}`,{
                         cache: "no-store"
                     });
                     const {data}:{data:LiveGameState[]} = await resp.json();
