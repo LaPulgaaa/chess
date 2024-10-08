@@ -2,42 +2,68 @@ import { Chess, Move, Square } from "chess.js";
 
 export class GameManager{
     private static instance: GameManager;
-    private game: Chess;
+    private games: Map<string,Chess>;
 
-    private constructor(fen: string | undefined){
-        this.game = new Chess(fen);
+    private constructor(){
+        this.games = new Map();
     }
 
-    public static get_instance(fen?: string){
+    public static get_instance(){
         if(!GameManager.instance){
-            GameManager.instance = new GameManager(fen);
+            GameManager.instance = new GameManager();
         }
 
         return GameManager.instance;
     }
 
-    public make_move(from: string, to :string){
+    public add_game(game_id: string, fen: string){
+        this.games.set(game_id, new Chess(fen));
+    }
+
+    public get_game_board(game_id: string){
+        if(this.games.has(game_id)){
+            const game = this.games.get(game_id)!;
+            return game.board();
+        }
+        return undefined;
+    }
+
+    public make_move(game_id: string, from: string, to: string){
+
         try{
-            this.game.move({
-                from,
-                to,
-            });
-            return true;
+            if(this.games.has(game_id)){
+                let game = this.games.get(game_id)!;
+                game.move({
+                    from,
+                    to,
+                });
+
+                return game.board();
+            }
+
+            throw new Error("Game does not exists");
         }catch(err){
             console.log(err);
-            return false;
+            return undefined;
         }
+
     }
 
-    public reset_board(){
-        this.game.reset();
+    public reset_board(game_id: string){
+        if(this.games.has(game_id)){
+            this.games.get(game_id)!.reset();
+
+            return this.games.get(game_id)!;
+        }
+
+        return undefined;
     }
 
-    public get_board(){
-        return this.game.board();
-    }
+    public get_moves(game_id: string){
+        if(this.games.has(game_id)){
+            this.games.get(game_id)!.moves();
+        }
 
-    public get_moves(square: Square){
-        return this.game.moves({square});
+        return [];
     }
 }
