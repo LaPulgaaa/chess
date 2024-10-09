@@ -74,7 +74,7 @@ export default function Game({params}:{params: {game_id: string}}){
             {
                 game_state.state === "hasValue" && game_state.getValue() !== null && board ? 
                 <div className="flex lg:flex-row flex-col justify-between m-12 space-x-2">
-                    <Board board={board} make_move={send_move} game_id={game_id}/>
+                    <Board board={board} make_move={send_move} game_id={game_id} color={game_state.getValue()!.color}/>
                     <div className="w-full">Record moves her</div>
                 </div> : 
                 <div>Loading...</div>

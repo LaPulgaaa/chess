@@ -71,7 +71,7 @@ type Board = ({
 
 
 
-export default function Board({board,game_id,make_move}:{board: Board,game_id: string,make_move:(from: string, to: string) => void}){
+export default function Board({board,game_id,make_move,color}:{board: Board,game_id: string,make_move:(from: string, to: string) => void,color: "b" | "w"}){
 
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
