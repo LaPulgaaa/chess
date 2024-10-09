@@ -120,11 +120,14 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
         }
 
         else if(square_node){
-            square_node.style.backgroundColor = "#ffeb3b";
-
             //@ts-ignore
             const sq: Square = square_node.id;
-            
+            const piece_info = GameManager.get_instance().get_piece_info(game_id,sq);
+            if(!piece_info || piece_info.color !== color){
+                return;
+            }
+
+            square_node.style.backgroundColor = "#ffeb3b";
             const possible_moves = GameManager.get_instance().get_moves(game_id,sq);
             console.log(possible_moves);
 

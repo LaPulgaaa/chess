@@ -80,4 +80,12 @@ export class GameManager{
         return [];
     }
 
+    public get_piece_info(game_id: string, square: Square){
+        if(this.games.has(game_id)){
+            return this.games.get(game_id)!.get(square);
+        }
+
+        return null;
+    }
+
 }
