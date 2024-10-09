@@ -1,12 +1,13 @@
 'use server'
 
 import { HandshakeIcon, SearchIcon } from "lucide-react";
-import Board from "../board";
+
 import { Avatar, AvatarFallback, AvatarImage, Badge, Input } from "@repo/ui";
 import { get_friends } from "./actions";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Search from "./search";
+import DummyBoard from "../dummy_board";
 
 export default async function Friend(){
     const session = await getServerSession();
@@ -16,7 +17,7 @@ export default async function Friend(){
     const friends = await get_friends(session.user?.email!);
     return (
         <div className="flex lg:flex-row flex-col justify-between m-12 space-x-2">
-            <Board fen={""}/>
+            <DummyBoard/>
             <div className="w-full flex flex-col items-center dark:bg-zinc-900 bg-orange-100 mt-4">
                 <div className="flex space-x-2 justify-center mt-4">
                     <HandshakeIcon className="mt-2 mr-2"/>

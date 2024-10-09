@@ -33,7 +33,7 @@ export default function LiveGames(){
                     const piece_img = game.color === "b" ? wq : bq;
                     const plays_str = game.plays.slice(0,-7).join(",")
                     return (
-                        <Link href={`/home/play/online/game/${game.game_id}`}>
+                        <Link key={game.game_id} href={`/home/play/online/game/${game.game_id}`}>
                         <div
                         className="w-full flex space-x-4 justify-between p-2 rounded-md bg-zinc-800 p-5 rounded-sm">
                             <div className="flex space-x-2">

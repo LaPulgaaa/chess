@@ -3,6 +3,7 @@ import { createClient } from "redis";
 import prisma from "@repo/prisma";
 import {redis_queue_payload_schema} from "@repo/types";
 import type { RedisQueuePayload } from "@repo/types";
+import { Chess } from "chess.js";
 
 export const client = createClient();
 
@@ -17,8 +18,8 @@ export async function start_queue_worker(){
                 continue;
 
                 const raw_data = resp.element;
-                const data = redis_queue_payload_schema.parse(JSON.parse(raw_data));
-                await handle_popped_data(data);
+                push_move_into_db(raw_data);
+                
             }catch(err){
                 console.log(err);
             }
@@ -30,28 +31,35 @@ export async function start_queue_worker(){
     }
 }
 
-async function handle_popped_data(payload: RedisQueuePayload){
+async function push_move_into_db(raw_data: string){
     try{
-        if(payload.type === "Move") {
-            const move_data = payload.data;
-            await prisma.move.create({
-                data: move_data
-            })
-        }
-        else if(payload.type === "Player"){
-            const player_data = payload.data;
-            await prisma.player.create({
-                data: player_data
-            })
-        }
-        else if(payload.type === "Game"){
-            const game_data = payload.data;
-            await prisma.game.create({
-                data: game_data
-            })
-        }
+        const {from, to, prev_fen, player_id, game_id}
+        :{from: string,to: string,prev_fen: string, player_id: string, game_id: string}
+        = JSON.parse(raw_data);
+
+        const game = new Chess(prev_fen);
+        game.move({
+            from,
+            to,
+        });
+        await prisma.move.create({
+            data: {
+                playerId: player_id,
+                move: to,
+                beforeState: prev_fen,
+                afterState: game.fen(),
+                gameId: game_id
+            }
+        });
+        await prisma.game.update({
+            where: {
+                uid: game_id
+            },
+            data: {
+                currentState: game.fen(),
+            }
+        });
     }catch(err){
         console.log(err);
-        client.lPush("db",JSON.stringify(payload));
     }
 }

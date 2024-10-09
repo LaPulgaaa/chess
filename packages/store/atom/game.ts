@@ -23,10 +23,13 @@ export const live_games_store = atomFamily<LiveGameState[] | null, {username: st
     })
 });
 
-export const get_game_from_id = selectorFamily<LiveGameState | null, {username: string, game_id: string}>({
+export const get_game_from_id = selectorFamily<LiveGameState | null, {username: string | undefined, game_id: string}>({
     key: "get_game_from_id",
-    get: ({username, game_id}:{username: string, game_id: string}) =>
+    get: ({username, game_id}:{username: string | undefined, game_id: string}) =>
         ({get}) => {
+            if(username === undefined)
+                return null;
+            
             const all_live_games = get(live_games_store({username}));
 
             const possible_live_game = all_live_games?.find((game) => game.game_id === game_id);

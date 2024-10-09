@@ -79,6 +79,27 @@ export class SignallingManager {
         this.handle_send(message);
     }
 
+    BULK_SUBSCRIBE(user_id: string){
+        const message = JSON.stringify({
+            type: 'BULK_SUBSCRIBE',
+            payload: {
+                user_id,
+            }
+        });
+
+        this.handle_send(message);
+    }
+
+    BULK_UNSUBSCRIBE(user_id: string){
+        const message = JSON.stringify({
+            type: "BULK_UNSUBSCRIBE",
+            payload: {
+                user_id,
+            }
+        });
+        this.handle_send(message);
+    }
+
     LEAVE(){
         const message = JSON.stringify({
             type: "LEAVE",
@@ -116,6 +137,10 @@ export class SignallingManager {
     }
 
     PLAY(message: string){
+        this.handle_send(message);
+    }
+
+    MOVE(message: string){
         this.handle_send(message);
     }
 

@@ -96,16 +96,20 @@ export default function Connect(){
     useEffect(()=>{
         if(status === "authenticated"){
             //@ts-ignore
-            SignallingManager.get_instance(session.data.username);
+            const username = session.data.username;
+            SignallingManager.get_instance(username);
+            SignallingManager.get_instance().BULK_SUBSCRIBE(username);
             SignallingManager.get_instance().REGISTER_CALLBACK("INVITE",recieve_challenge_callbacks);
             SignallingManager.get_instance().REGISTER_CALLBACK("CHALLENGE", send_challenge_callback);
-            SignallingManager.get_instance().REGISTER_CALLBACK("GAME_START", start_game_callback);
+            SignallingManager.get_instance().REGISTER_CALLBACK("GAME_START", start_game_callback);            
         }
 
         return ()=>{
             if(status === "authenticated"){
                 //@ts-ignore
-                SignallingManager.get_instance(session.data.username).DEREGISTER_CALLBACK("INVITE");
+                const username = session.data.username;
+                SignallingManager.get_instance(username).DEREGISTER_CALLBACK("INVITE");
+                SignallingManager.get_instance().BULK_UNSUBSCRIBE(username);
                 SignallingManager.get_instance().DEREGISTER_CALLBACK("CHALLENGE");
                 SignallingManager.get_instance().DEREGISTER_CALLBACK("GAME_START");
             }

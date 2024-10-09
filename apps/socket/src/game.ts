@@ -1,58 +1,35 @@
 import type { Square } from "chess.js";
 
 import { GameManager } from "./game_manager";
-import { client } from "./worker";
-import type {Color} from "@repo/types";
-import { RedisQueuePayload } from "@repo/types";
 
 export type Player = {
-    type: "PLAYER",
-    user_id: string,
-    color: Color
+    player_id: string,
+    color: "b" | "w"
 }
 
 export type PlayerMoveIncomingData = {
     type: "MOVE",
-    game_id: string,
-    user: Player,
-    move: Square,
+    payload: {
+        game_id: string,
+        player: Player,
+        from: string,
+        to: string,
+        prev_fen: string,
+    }
 }
 
-export async function handle_move(incoming_data: PlayerMoveIncomingData){
-    const game = GameManager.get_instance().get_game(incoming_data.game_id);
-
-    if(game === undefined)
-        return undefined;
+export function handle_move(incoming_data: PlayerMoveIncomingData["payload"]){
 
     try{
-        const resp = game.chess.move(incoming_data.move);
-        const is_game_over = game.chess.isGameOver();
-        // Doing DB stuff here.
-
-        const outgoing_data = {
-            after: resp.after,
-            from: resp.from,
-            to: resp.to,
-            over: is_game_over,
-            turn: game.chess.turn()
-        }
-        const queue_payload: RedisQueuePayload = {
-            type: "Move" as const,
-            data: {
-                gameId: incoming_data.game_id,
-                move: incoming_data.move,
-                beforeState: resp.before,
-                afterState: resp.after,
-                playerId: incoming_data.user.user_id,
-                playedAt: new Date().toUTCString(),
-                desc: game.chess.getComment(),
-            }
+        const payload = {
+            from: incoming_data.from,
+            to: incoming_data.to,
+            color: incoming_data.player.color,
         };
-        await client.lPush("db",JSON.stringify(queue_payload));
 
-        return JSON.stringify(outgoing_data);
+        return JSON.stringify(payload);
     }catch(err){
         console.log(err);
-        return "INVALID MOVE";
+        return undefined;
     }
 }

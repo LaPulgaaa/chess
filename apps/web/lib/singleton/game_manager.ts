@@ -17,7 +17,11 @@ export class GameManager{
     }
 
     public add_game(game_id: string, fen: string){
+        if(this.games.has(game_id))
+            return this.games.get(game_id)!.board();
+
         this.games.set(game_id, new Chess(fen));
+        return this.games.get(game_id)!.board();
     }
 
     public get_game_board(game_id: string){
@@ -25,6 +29,15 @@ export class GameManager{
             const game = this.games.get(game_id)!;
             return game.board();
         }
+        return undefined;
+    }
+
+    public get_game_fen(game_id: string){
+        if(this.games.has(game_id))
+        {
+            return this.games.get(game_id)!.fen();
+        }
+
         return undefined;
     }
 
@@ -59,11 +72,12 @@ export class GameManager{
         return undefined;
     }
 
-    public get_moves(game_id: string){
+    public get_moves(game_id: string,square: Square){
         if(this.games.has(game_id)){
-            this.games.get(game_id)!.moves();
+            return this.games.get(game_id)!.moves({ square });
         }
 
         return [];
     }
+
 }

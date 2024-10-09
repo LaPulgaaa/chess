@@ -3,7 +3,6 @@
 import { MouseEvent, useRef, useState} from "react";
 import Image, { StaticImageData } from "next/image";
 
-import { useSession } from "next-auth/react";
 import type { Square, PieceSymbol, Color } from "chess.js";
 import { SQUARES } from "chess.js";
 
@@ -26,10 +25,9 @@ import bb from "@/public/bb.png";
 import bq from "@/public/bq.png";
 import bk from "@/public/bk.png";
 import bp from "@/public/bp.png";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { SignallingManager } from "@/lib/singleton/signal_manager";
-import { useToast } from "@repo/ui";
+import { useRecoilState } from "recoil";
 
+import { LiveGameState } from "@repo/types";
 
 type PieceWithColor = "wr" | "wn" | "wb" | "wq" | "wk" | "wp" | "br" | "bn" | "bb" | "bq" | "bk" | "bp";
 
@@ -71,12 +69,10 @@ type Board = ({
     color: Color;
 } | null)[][];
 
-export default function Board({fen}:{fen: string}){
-    const session = useSession();
 
-    const { toast } = useToast();
 
-    const [board, setBoard] = useState<Board>(GameManager.get_instance().get_board());
+export default function Board({board,game_id,make_move}:{board: Board,game_id: string,make_move:(from: string, to: string) => void}){
+
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
     const [orient,setOrient] = useRecoilState(board_orien);
@@ -107,8 +103,7 @@ export default function Board({fen}:{fen: string}){
             const possible_moves = GameManager.get_instance().get_moves(from);
 
             if(possible_moves && from !== to){
-                GameManager.get_instance().make_move(from,to);
-                setBoard(GameManager.get_instance().get_board());
+                make_move(from,to);
             }
 
             set_reset_color("RESET", validmove ?? []);
@@ -130,7 +125,8 @@ export default function Board({fen}:{fen: string}){
             //@ts-ignore
             const sq: Square = square_node.id;
             
-            const possible_moves = GameManager.get_instance().get_moves(sq);
+            const possible_moves = GameManager.get_instance().get_moves(game_id,sq);
+            console.log(possible_moves);
 
             setValidMoves(possible_moves);
             setFocusedPiece(square_node);
