@@ -39,10 +39,10 @@ export default function LiveGames(){
                             <div className="flex space-x-2">
                                 <div className="flex space-x-2">
                                     <Image 
-                                    className="w-[32px] "
+                                    className="w-[32px]"
                                     src={piece_img} alt={game.color}/>
-                                    <p>{game.opponent.username}</p>
-                                    <p className="text-sm text-muted-foreground mt-1">#{game.opponent.rating}</p>
+                                    <p className="mt-1">{game.opponent.username}</p>
+                                    <p className="text-sm text-muted-foreground mt-2">#{game.opponent.rating}</p>
                                 </div>
                             </div>
                             <div>
