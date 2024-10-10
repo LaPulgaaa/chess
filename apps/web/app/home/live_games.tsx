@@ -35,7 +35,7 @@ export default function LiveGames(){
                     return (
                         <Link key={game.game_id} href={`/home/play/online/game/${game.game_id}`}>
                         <div
-                        className="w-full flex space-x-4 justify-between p-2 rounded-md bg-zinc-800 p-5 rounded-sm">
+                        className="w-full my-2 flex space-x-4 justify-between p-2 rounded-md bg-zinc-800 p-5 rounded-sm">
                             <div className="flex space-x-2">
                                 <div className="flex space-x-2">
                                     <Image 
