@@ -21,7 +21,6 @@ export async function GET(req:NextRequest, {params}:{params: {username: string}}
                 game: {
                     select: {
                         status: true,
-                        plays: true,
                         currentState: true,
                         players: {
                             select: {
@@ -31,6 +30,11 @@ export async function GET(req:NextRequest, {params}:{params: {username: string}}
                                         rating: true,
                                     }
                                 }
+                            }
+                        },
+                        moves: {
+                            select: {
+                                move: true,
                             }
                         }
                     }
@@ -48,7 +52,7 @@ export async function GET(req:NextRequest, {params}:{params: {username: string}}
                 color: p.color,
                 player_id: p.id,
                 fen: p.game.currentState,
-                plays: p.game.plays,
+                plays: p.game.moves.flatMap((m) => m.move),
                 status: p.game.status,
                 opponent: opponent?.user
             }

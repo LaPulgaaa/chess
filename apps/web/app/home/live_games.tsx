@@ -31,7 +31,7 @@ export default function LiveGames(){
             {
                 live_games.state === "hasValue" && live_games.getValue()?.map((game)=>{
                     const piece_img = game.color === "b" ? wq : bq;
-                    const plays_str = game.plays.slice(0,-7).join(",")
+                    const plays_str = game.plays.slice(-7).join(",")
                     return (
                         <Link key={game.game_id} href={`/home/play/online/game/${game.game_id}`}>
                         <div
@@ -47,7 +47,7 @@ export default function LiveGames(){
                             </div>
                             <div>
                                 {
-                                    plays_str.length > 0 ? plays_str : <p className="mt-1 text-sm text-muted-foreground">No moves played yet.</p>
+                                    plays_str.length > 0 ? <p className="text-muted-foreground">...{plays_str}</p> : <p className="mt-1 text-sm text-muted-foreground">No moves played yet.</p>
                                 }
                             </div>
                         </div>
