@@ -6,8 +6,6 @@ import Image, { StaticImageData } from "next/image";
 import type { Square, PieceSymbol, Color } from "chess.js";
 import { SQUARES } from "chess.js";
 
-import { board_orien } from "@repo/store";
-
 import { GameManager } from "@/lib/singleton/game_manager";
 
 // white pieces
@@ -25,9 +23,9 @@ import bb from "@/public/bb.png";
 import bq from "@/public/bq.png";
 import bk from "@/public/bk.png";
 import bp from "@/public/bp.png";
-import { useRecoilState } from "recoil";
-
-import { LiveGameState } from "@repo/types";
+import { DoubleArrowUpIcon } from "@radix-ui/react-icons";
+import { FlipVertical, FlipVerticalIcon } from "lucide-react";
+import { Button } from "@repo/ui";
 
 type PieceWithColor = "wr" | "wn" | "wb" | "wq" | "wk" | "wp" | "br" | "bn" | "bb" | "bq" | "bk" | "bp";
 
@@ -75,7 +73,7 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
 
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
-    const [orient,setOrient] = useRecoilState(board_orien);
+    const [orient,setOrient] = useState(color);
 
     const board_ref = useRef<HTMLDivElement>(null);
     let square_refs = useRef<Map<string, HTMLSpanElement | null>>(new Map());
@@ -168,9 +166,10 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
     }
 
     return(
-        <div 
-        ref={board_ref}
-        className={`w-full mt-4 flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
+        <div className="w-full mt-4 flex items-center">
+            <div 
+            ref={board_ref}
+            className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
             {
                 board.map((row,row_no)=>{
                     return(
@@ -211,6 +210,15 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
                     )
                 })
             }
+            </div>
+            <div><Button 
+            onClick={() => {
+                if(orient === "b")
+                    setOrient("w");
+                else 
+                    setOrient("b");
+            }}
+            size={"icon"} variant={"secondary"} className="items-center rounded-none"><FlipVertical/></Button></div>
         </div>
     )
 }
