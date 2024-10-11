@@ -40,7 +40,7 @@ export default function Connect(){
     function start_game_callback(raw_data: string){
         const data:GameStartCallbackData = JSON.parse(raw_data);
         toast({
-            duration: 5000,
+            duration: 2000,
             draggable: true,
             title: "Redirecting to new game..."
         })
