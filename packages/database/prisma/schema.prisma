@@ -122,7 +122,7 @@ model Game {
 
 model Move {
   id String @id @default(cuid())
-  game Game @relation(fields: [gameId],references: [uid])
+  game Game @relation(fields: [gameId],references: [uid], onDelete: Cascade)
   gameId String
   beforeState String
   afterState String
