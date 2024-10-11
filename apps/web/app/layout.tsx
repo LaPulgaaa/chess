@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "../styles/global.css";
 import { ThemeProvider } from "@repo/ui";
-import Navbar from "../components/navbar";
 import { AuthProvider } from "@/components/auth_provider";
 import { Toaster } from "@repo/ui";
 import RecoilContextProvider from "@/components/recoil_provider";
@@ -37,7 +36,6 @@ export default function RootLayout({
         >
           <RecoilContextProvider>
             <AuthProvider>
-              <Navbar/>
               {children}
               <Toaster/>
             </AuthProvider>

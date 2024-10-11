@@ -32,6 +32,7 @@ import prisma from "@repo/prisma";
 
 import { get_matches } from "./actions";
 import LiveGames from "./live_games";
+import Navbar from "@/components/navbar";
 
 export async function get_details(email: string | null | undefined){
     if(email === null || email === undefined)
@@ -110,7 +111,9 @@ export default async function Home(){
     ]
 
     return(
-        <div className="mx-36 my-12 space-y-12">
+        <div>
+            <Navbar/>
+            <div className="mx-36 my-12 space-y-12">
             <div className="flex justify-between">
                 <div className="flex mx-8">
                     <Avatar>
@@ -217,6 +220,7 @@ export default async function Home(){
                         </TableRow>
                     </TableHeader>
                 </Table>
+            </div>
             </div>
         </div>
     )
