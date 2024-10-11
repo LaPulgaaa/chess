@@ -1,6 +1,9 @@
 'use client'
 
+import { FlipVertical } from "lucide-react";
+
 import { get_game_from_id } from "@repo/store";
+import { Button } from "@repo/ui";
 import Board from "../../board";
 import type { Square, PieceSymbol, Color} from "chess.js"
 import { useSession } from "next-auth/react";
@@ -26,6 +29,7 @@ export default function Game({params}:{params: {game_id: string}}){
     const session = useSession();
     const game_state = useRecoilValueLoadable(get_game_from_id({game_id}));
     const [board,setBoard] = useState<Board | undefined>(undefined);
+    const [orient,setOrient] = useState<"w" | "b">("w");
 
     function move_callback(raw_data:string){
         const data:MoveCallbackData = JSON.parse(raw_data);
@@ -65,15 +69,47 @@ export default function Game({params}:{params: {game_id: string}}){
         if(game_state.state === "hasValue" && game_state.getValue()?.fen){
             const board = GameManager.get_instance().add_game(game_id, game_state.getValue()!.fen);
             setBoard(board);
+            setOrient(game_state.getValue()!.color);
         }
     },[game_state.state, game_state.getValue()]);
 
     return (
         <div>
             {
-                game_state.state === "hasValue" && game_state.getValue() !== null && board ? 
-                <div className="flex lg:flex-row flex-col justify-between m-12 space-x-2">
-                    <Board board={board} make_move={send_move} game_id={game_id} color={game_state.getValue()!.color}/>
+                session.status === "authenticated" && game_state.state === "hasValue" && game_state.getValue() !== null && board ? 
+                <div className="flex lg:flex-row flex-col justify-between mx-12 my-8 space-x-2">
+                    <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
+                        <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4 rounded-md">
+                            {
+                                game_state.getValue()?.color === "b" ? 
+                                // @ts-ignore
+                            <p className="text-muted-foreground">{session.data.username + `${` #`}` + session.data.rating}</p>  :
+                            <p className="text-muted-foreground">{game_state.getValue()?.opponent.username + `${` #`}` + game_state.getValue()?.opponent.rating}</p>
+                            }
+                        </div>
+                        <div className="w-full flex items-center">
+                            <Board board={board} make_move={send_move} game_id={game_id} color={orient}/>
+                            <div>
+                            <Button 
+                            onClick={() => {
+                                if(orient === "b")
+                                    setOrient("w");
+                                else 
+                                    setOrient("b");
+                            }}
+                            size={"icon"} variant={"secondary"} className="items-center rounded-none"><FlipVertical/>
+                            </Button>
+                            </div>
+                        </div>
+                        <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4 rounded-md">
+                            {
+                            game_state.getValue()?.color === "w" ? 
+                            // @ts-ignore
+                            <p className="text-muted-foreground">{session.data.username + `${` #`}` + session.data.rating}</p>  :
+                            <p className="text-muted-foreground">{game_state.getValue()?.opponent.username + `${` #`}` + game_state.getValue()?.opponent.rating}</p>
+                            }
+                        </div>
+                    </div>
                     <div className="w-full">Record moves her</div>
                 </div> : 
                 <div>Loading...</div>

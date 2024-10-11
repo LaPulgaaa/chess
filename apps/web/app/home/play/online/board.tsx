@@ -24,7 +24,7 @@ import bq from "@/public/bq.png";
 import bk from "@/public/bk.png";
 import bp from "@/public/bp.png";
 import { DoubleArrowUpIcon } from "@radix-ui/react-icons";
-import { FlipVertical, FlipVerticalIcon } from "lucide-react";
+
 import { Button } from "@repo/ui";
 
 type PieceWithColor = "wr" | "wn" | "wb" | "wq" | "wk" | "wp" | "br" | "bn" | "bb" | "bq" | "bk" | "bp";
@@ -73,7 +73,7 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
 
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
-    const [orient,setOrient] = useState(color);
+    const orient = color;
 
     const board_ref = useRef<HTMLDivElement>(null);
     let square_refs = useRef<Map<string, HTMLSpanElement | null>>(new Map());
@@ -166,59 +166,49 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
     }
 
     return(
-        <div className="w-full mt-4 flex items-center">
-            <div 
-            ref={board_ref}
-            className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
-            {
-                board.map((row,row_no)=>{
-                    return(
-                        <div
-                        key={row_no} 
-                        className="flex">
-                            {
-                                row.map((sq,col_no)=>{
-                                    return(
-                                        <span
-                                        key={assign_id(row_no,col_no)}
-                                        className="flex flex-row">
-                                            {
-                                                <span
-                                                ref={(el)=>{
-                                                    if(el){
-                                                        square_refs.current.set(assign_id(row_no,col_no),el);
-                                                    }
-                                                }}
-                                                onClick={handleClick}
-                                                id={assign_id(row_no,col_no)}
-                                                className = {`${find_ind(row_no,col_no) %2 == 0 ? "dark:bg-[#b0bec5] bg-[#f0d9b5]" : "dark:bg-[#37474f] bg-[#b58863]"} relative  md:h-[100px] md:w-[100px] border-2 h-[80px] w-[80px]`}>
-                                                    {
-                                                        sq && <Image
-                                                        className="absolute"
-                                                        loading="lazy"
-                                                        //@ts-ignore
-                                                        src = {piece_store[(sq.color+sq.type)]} 
-                                                        alt={sq.type}/>
-                                                    }
-                                                </span>
-                                            }
-                                        </span>
-                                    )
-                                })
-                            }
-                        </div>
-                    )
-                })
-            }
-            </div>
-            <div><Button 
-            onClick={() => {
-                if(orient === "b")
-                    setOrient("w");
-                else 
-                    setOrient("b");
-            }}
-            size={"icon"} variant={"secondary"} className="items-center rounded-none"><FlipVertical/></Button></div>
+        <div 
+        ref={board_ref}
+        className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
+        {
+            board.map((row,row_no)=>{
+                return(
+                    <div
+                    key={row_no} 
+                    className="flex">
+                        {
+                            row.map((sq,col_no)=>{
+                                return(
+                                    <span
+                                    key={assign_id(row_no,col_no)}
+                                    className="flex flex-row">
+                                        {
+                                            <span
+                                            ref={(el)=>{
+                                                if(el){
+                                                    square_refs.current.set(assign_id(row_no,col_no),el);
+                                                }
+                                            }}
+                                            onClick={handleClick}
+                                            id={assign_id(row_no,col_no)}
+                                            className = {`${find_ind(row_no,col_no) %2 == 0 ? "dark:bg-[#b0bec5] bg-[#f0d9b5]" : "dark:bg-[#37474f] bg-[#b58863]"} relative  md:h-[100px] md:w-[100px] border-2 h-[80px] w-[80px]`}>
+                                                {
+                                                    sq && <Image
+                                                    className="absolute"
+                                                    loading="lazy"
+                                                    //@ts-ignore
+                                                    src = {piece_store[(sq.color+sq.type)]} 
+                                                    alt={sq.type}/>
+                                                }
+                                            </span>
+                                        }
+                                    </span>
+                                )
+                            })
+                        }
+                    </div>
+                )
+            })
+        }
         </div>
     )
 }
