@@ -66,7 +66,7 @@ export default function Game({params}:{params: {game_id: string}}){
             const board = GameManager.get_instance().add_game(game_id, game_state.getValue()!.fen);
             setBoard(board);
         }
-    },[game_state.state]);
+    },[game_state.state, game_state.getValue()]);
 
     return (
         <div>
