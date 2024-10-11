@@ -2,14 +2,24 @@ import { NextRequest } from "next/server";
 
 import prisma from "@repo/prisma";
 
-export async function GET(req:NextRequest, {params}:{params: {username: string}}){
-    const username = params.username;
+import { getToken } from "next-auth/jwt";
+
+export async function GET(req:NextRequest){
+    const token = await getToken({ req });
+
+    if(token === null){
+        return Response.json({
+            message: "UNAUTHORIZED ACCESS"
+        },{ status:401 })
+    }
+    //@ts-ignore
+    const username:string = token.username;
 
     try{
         const resp = await prisma.player.findMany({
             where: {
                 user: {
-                    username: username
+                    username
                 },
                 game: {
                     status: {

@@ -24,8 +24,7 @@ type Board = ({
 export default function Game({params}:{params: {game_id: string}}){
     const game_id = params.game_id;
     const session = useSession();
-    //@ts-ignore
-    const game_state = useRecoilValueLoadable(get_game_from_id({username: session?.data?.username ?? undefined, game_id}));
+    const game_state = useRecoilValueLoadable(get_game_from_id({game_id}));
     const [board,setBoard] = useState<Board | undefined>(undefined);
 
     function move_callback(raw_data:string){

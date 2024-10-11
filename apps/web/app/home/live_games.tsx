@@ -16,7 +16,7 @@ export default function LiveGames(){
     const session = useSession();
     const router = useRouter();
     //@ts-ignore
-    const live_games = useRecoilValueLoadable(live_games_store({username: session.data?.username}));
+    const live_games = useRecoilValueLoadable(live_games_store);
 
     if(session.status !== "authenticated")
     {
