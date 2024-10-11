@@ -28,6 +28,7 @@ export const auth_options:NextAuthOptions = {
                         username: true,
                         name: true,
                         avatar: true,
+                        rating: true,
                     }
                 });
 
@@ -75,6 +76,7 @@ export const auth_options:NextAuthOptions = {
                     ...token,
                     email: session?.email ?? token.email,
                     username: session?.username ?? token.username,
+                    rating: session?.rating ?? token.rating,
                     name: session?.name ?? token.name,
                     avatar: session?.avatar ?? token.picture,
                 } as JWT;
@@ -92,6 +94,8 @@ export const auth_options:NextAuthOptions = {
                     email: user.email,
                     //@ts-ignore
                     username: user.username,
+                    //@ts-ignore
+                    rating: user.rating,
                     name: user.name,
                     avatar: user.image,
                 } as JWT;
