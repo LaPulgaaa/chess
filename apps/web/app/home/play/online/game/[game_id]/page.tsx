@@ -17,6 +17,10 @@ type MoveCallbackData = {
     from: string,
     to: string,
     color: "w" | "b",
+    promotion?: string,
+    is_game_over: boolean,
+    is_checkmate: boolean,
+    is_draw: boolean,
 }
 
 type Board = ({
@@ -37,11 +41,11 @@ export default function Game({params}:{params: {game_id: string}}){
     function move_callback(raw_data:string){
         const data:MoveCallbackData = JSON.parse(raw_data);
         setMoves((moves) => [...moves,data.to]);
-        let updated_state = GameManager.get_instance().make_move(game_id,data.from,data.to);
+        let updated_state = GameManager.get_instance().make_move(game_id,data.from,data.to,data.promotion);
         setBoard(updated_state)
     }
 
-    function send_move(from: string,to: string){
+    function send_move(from: string,to: string, promotion?: string){
         const message = JSON.stringify({
             type: 'MOVE',
             payload: {
@@ -52,7 +56,8 @@ export default function Game({params}:{params: {game_id: string}}){
                 },
                 from,
                 to,
-                prev_fen: GameManager.get_instance().get_game_fen(game_id)
+                prev_fen: GameManager.get_instance().get_game_fen(game_id),
+                promotion
             }
         })
         SignallingManager.get_instance().MOVE(message);

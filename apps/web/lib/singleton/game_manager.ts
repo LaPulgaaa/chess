@@ -41,7 +41,7 @@ export class GameManager{
         return undefined;
     }
 
-    public make_move(game_id: string, from: string, to: string){
+    public make_move(game_id: string, from: string, to: string, promotion?: string){
 
         try{
             if(this.games.has(game_id)){
@@ -49,6 +49,7 @@ export class GameManager{
                 game.move({
                     from,
                     to,
+                    promotion,
                 });
 
                 return game.board();
