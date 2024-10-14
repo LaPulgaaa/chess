@@ -1,4 +1,4 @@
-import type { Square } from "chess.js";
+import { Chess } from "chess.js";
 
 import { GameManager } from "./game_manager";
 
@@ -31,5 +31,18 @@ export function handle_move(incoming_data: PlayerMoveIncomingData["payload"]){
     }catch(err){
         console.log(err);
         return undefined;
+    }
+}
+
+export function verify_move(from: string, to: string, prev_fen: string){
+    try{
+        const game = new Chess(prev_fen);
+        game.move({
+            from,
+            to,
+        });
+        return true;
+    }catch(err){
+        return false;
     }
 }

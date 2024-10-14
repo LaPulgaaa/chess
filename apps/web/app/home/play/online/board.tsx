@@ -98,9 +98,7 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
             const to = square_node.id;
 
             //@ts-ignore
-            const possible_moves = GameManager.get_instance().get_moves(from);
-
-            if(possible_moves && from !== to){
+            if(from !== to && validmove !== undefined){
                 make_move(from,to);
             }
 

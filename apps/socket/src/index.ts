@@ -3,7 +3,7 @@ import WebSocket from "ws";
 import { createClient } from "redis";
 
 import { RedisSubscriptionManager } from "./room_manager";
-import { handle_move, type Player, type PlayerMoveIncomingData } from "./game";
+import { handle_move, type Player, type PlayerMoveIncomingData , verify_move} from "./game";
 import { start_queue_worker } from "./worker";
 import { create_game } from "./utils";
 import { GameManager } from "./game_manager";
@@ -209,7 +209,9 @@ async function init_ws_server(){
                     break;
                 }
                 case "MOVE": {
-                    
+                    const is_move_valid = verify_move(data.payload.from, data.payload.to, data.payload.prev_fen);
+                    if(!is_move_valid)
+                        return;
                     const resp = handle_move(data.payload);
                     if(resp !== undefined)
                     {
