@@ -99,8 +99,8 @@ export default function Game({params}:{params: {game_id: string}}){
             {
                 session.status === "authenticated" && game_state.state === "hasValue" && game_state.getValue() !== null && board ? 
                 <div className="flex lg:flex-row flex-col justify-between mx-12 my-8 space-x-2">
-                    <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"}`}>
-                        <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4 rounded-md">
+                    <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"} mx-24`}>
+                        <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
                             {
                                 game_state.getValue()?.color === "b" ? 
                                 // @ts-ignore
@@ -122,7 +122,7 @@ export default function Game({params}:{params: {game_id: string}}){
                             </Button>
                             </div>
                         </div>
-                        <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4 rounded-md">
+                        <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
                             {
                             game_state.getValue()?.color === "w" ? 
                             // @ts-ignore
