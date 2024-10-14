@@ -116,3 +116,5 @@ export type LiveGameState = {
         rating: string,
     },
 }
+
+export type GameStatus = z.output<typeof game_status_schema>;
