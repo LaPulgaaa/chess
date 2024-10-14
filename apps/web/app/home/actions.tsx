@@ -24,11 +24,17 @@ export async function get_matches(email: string){
                                     }
                                 },
                                 color: true,
+                                result: true,
                             }
                         },
                         createdAt: true,
-                        plays: true,
+                        moves: {
+                            select: {
+                                move: true,
+                            }
+                        },
                         status: true,
+                        uid: true,
                     }
                 }
             }

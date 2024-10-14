@@ -33,6 +33,7 @@ import prisma from "@repo/prisma";
 import { get_matches } from "./actions";
 import LiveGames from "./live_games";
 import Navbar from "@/components/navbar";
+import GamesTable from "./games_table";
 
 export async function get_details(email: string | null | undefined){
     if(email === null || email === undefined)
@@ -207,19 +208,7 @@ export default async function Home(){
                 </div>
             </div>
             <div>
-                <Table className="rounded-md border-2">
-                    <TableCaption>
-                        A list of matches played.
-                    </TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Players</TableHead>
-                            <TableHead>Result</TableHead>
-                            <TableHead>Moves</TableHead>
-                            <TableHead>Date</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                </Table>
+                <GamesTable matches={my_matches}/>
             </div>
             </div>
         </div>
