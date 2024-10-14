@@ -98,8 +98,8 @@ export default function Game({params}:{params: {game_id: string}}){
         <div>
             {
                 session.status === "authenticated" && game_state.state === "hasValue" && game_state.getValue() !== null && board ? 
-                <div className="flex lg:flex-row flex-col justify-between mx-12 my-8 space-x-2">
-                    <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"} mx-24`}>
+                <div className="flex lg:flex-row flex-col justify-between mx-12 md:mx-24 my-6 space-x-2">
+                    <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"} mt-2`}>
                         <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
                             {
                                 game_state.getValue()?.color === "b" ? 
@@ -131,14 +131,14 @@ export default function Game({params}:{params: {game_id: string}}){
                             }
                         </div>
                     </div>
-                    <div className="w-[720px] mx-4">
+                    <div className="w-[640px] m-2">
                         <div className="flex items-center dark:bg-zinc-800 p-2 py-3">
                             <StarFilledIcon className="mx-2"/>
                             <h3 className="scroll-m-20 font-semibold tracking-tight">
                                 Moves Played
                             </h3>
                         </div>
-                        <ScrollArea className=" h-[600px]">
+                        <ScrollArea className="md:h-[800px] h-[640px]">
                             <div 
                             ref={moves_ref}
                             className="grid grid-cols-2">
