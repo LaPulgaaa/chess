@@ -78,6 +78,22 @@ export default function Game({params}:{params: {game_id: string}}){
         }
     },[game_state.state, game_state.getValue()]);
 
+    useEffect(()=>{
+        const move_node = moves_ref.current;
+        if(move_node !== null){
+            const move_divs = move_node.querySelectorAll("#moves");
+            if(move_divs.length<1)
+                return ;
+
+            const last_move_div_idx = move_divs.length-1;
+            move_divs[last_move_div_idx]?.scrollIntoView({
+                inline: "end",
+                behavior: "smooth"
+            })
+        }
+    },[moves]);
+
+
     return (
         <div>
             {
