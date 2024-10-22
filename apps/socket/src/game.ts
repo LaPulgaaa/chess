@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
 
-import { GameManager } from "./game_manager";
+import { client } from ".";
 
 export type Player = {
     player_id: string,
@@ -19,7 +19,7 @@ export type PlayerMoveIncomingData = {
     }
 }
 
-export function process_move(incoming_data: PlayerMoveIncomingData["payload"]){
+export async function process_move(incoming_data: PlayerMoveIncomingData["payload"]){
     try{
         const game = new Chess(incoming_data.prev_fen);
 
@@ -32,6 +32,41 @@ export function process_move(incoming_data: PlayerMoveIncomingData["payload"]){
         const is_checkmate = game.isCheckmate();
         const is_draw = game.isDraw() || game.isInsufficientMaterial();
         const is_game_over = game.isGameOver();
+        let winner: {
+            color: "w" | "b",
+            player_id: string,
+        } | "NA" = "NA" as const;
+
+        if(is_game_over === true){
+            let payload = "";
+            if( is_checkmate === true ) {
+                winner = incoming_data.player;
+                payload = JSON.stringify({
+                    type: "GAME_STATUS",
+                    data: {
+                        game_id: incoming_data.game_id,
+                        status: {
+                            updated_status: "ENDED",
+                            winner: incoming_data.player,
+                            ended_at: new Date().toISOString(),
+                        },
+                    }
+                });
+            }
+            else if( is_draw === true ) {
+                payload = JSON.stringify({
+                    type: "GAME_STATUS",
+                    data: {
+                        game_id: incoming_data.game_id,
+                        status: {
+                            updated_status: "DREW",
+                            ended_at: new Date().toISOString(),
+                        },
+                    }
+                });
+            }
+            await client.lPush("db",payload);
+        }
 
         const payload = {
             from: incoming_data.from,

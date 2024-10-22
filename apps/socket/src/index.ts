@@ -79,7 +79,7 @@ export type IncomingClientData = {
     }
 };
 
-const client = createClient();
+export const client = createClient();
 
 const inroom_clients:WsClients = {};
 export const online_clients: Record<number, {
@@ -209,7 +209,7 @@ async function init_ws_server(){
                     break;
                 }
                 case "MOVE": {
-                    const resp = process_move(data.payload);
+                    const resp = await process_move(data.payload);
                     if(resp !== undefined)
                     {
                         const payload = JSON.stringify({
@@ -219,14 +219,17 @@ async function init_ws_server(){
                         RedisSubscriptionManager.get_instance().message({
                             room_id: data.payload.game_id,
                             payload
-                        })
+                        });
                     }
                     const db_content = JSON.stringify({
-                        player_id: data.payload.player.player_id,
-                        game_id: data.payload.game_id,
-                        from: data.payload.from,
-                        to: data.payload.to,
-                        prev_fen: data.payload.prev_fen
+                        type: "MOVE",
+                        data: {
+                            player_id: data.payload.player.player_id,
+                            game_id: data.payload.game_id,
+                            from: data.payload.from,
+                            to: data.payload.to,
+                            prev_fen: data.payload.prev_fen
+                        }
                     })
                     await client.lPush("db",db_content);
                     break;
