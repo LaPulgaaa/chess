@@ -17,47 +17,45 @@ export const game_status_schema = z.enum([
 ]);
 
 export const move_popped_data_schema = z.object({
-    gameId: z.string(),
-    move: z.string(),
-    beforeState: z.string(),
-    afterState: z.string(),
-    playerId: z.string(),
-    playedAt: z.string().datetime({offset: true}),
-    desc: z.string().nullish(),
+    player_id: z.string(),
+    game_id: z.string(),
+    from: z.string(),
+    to: z.string(),
+    prev_fen: z.string(),
 });
 
-export const player_popped_data_schema = z.object({
-    color: color_schema,
-    userId: z.string(),
-    gameId: z.string(),
-    finishedGame: z.boolean(),
-    result: match_result_schema,
-    gameToken: z.string(),
-});
+export const update_game_status_popped_data_schema = z.object({
+    game_id: z.string(),
+    status: z.discriminatedUnion("updated_status",[
+        z.object({
+            updated_status: z.literal("ENDED"),
+            winner: z.object({
+                color: color_schema,
+                player_id: z.string(),
+            }),
+            ended_at: z.string(),
+        }),
+        z.object({
+            updated_status: z.literal("IN_PROGRESS"),
+            started_at: z.string(),
+        }),
+        z.object({
+            updated_status: z.literal("DREW"),
+            ended_at: z.string(),
+        })
+    ])
 
-export const game_popped_data_schema = z.object({
-    uid: z.string(),
-    createdAt: z.string().datetime({ offset: true}),
-    startedAt: z.string().datetime({offset: true}).optional(),
-    plays: z.array(z.string()),
-    currentState: z.string(),
-    status: game_status_schema,
-    metadata: z.record(z.string()).optional(),
-});
+})
 
 export const redis_queue_payload_schema = z.discriminatedUnion("type",[
     z.object({
-        type: z.literal("Move"),
+        type: z.literal("MOVE"),
         data: move_popped_data_schema,
     }),
     z.object({
-        type: z.literal("Player"),
-        data: player_popped_data_schema
-    }),
-    z.object({
-        type: z.literal("Game"),
-        data: game_popped_data_schema,
-    }),
+        type: z.literal("GAME_STATUS"),
+        data: update_game_status_popped_data_schema,
+    })
 ]);
 
 export const user_signup_form_schema = z.object({
