@@ -76,6 +76,7 @@ export async function process_move(incoming_data: PlayerMoveIncomingData["payloa
             is_checkmate,
             is_draw,
             is_game_over,
+            winner,
         };
 
         return JSON.stringify(payload);

@@ -3,7 +3,7 @@
 import { FlipVertical } from "lucide-react";
 
 import { get_game_from_id } from "@repo/store";
-import { Button, ScrollArea } from "@repo/ui";
+import { Button, ScrollArea, useToast } from "@repo/ui";
 import Board from "../../board";
 import type { Square, PieceSymbol, Color} from "chess.js"
 import { useSession } from "next-auth/react";
@@ -19,9 +19,21 @@ type MoveCallbackData = {
     color: "w" | "b",
     promotion?: string,
     is_game_over: boolean,
-    is_checkmate: boolean,
     is_draw: boolean,
-}
+} & (
+    {
+        is_checkmate: true,
+        winner: {
+            color: "w" | "b",
+            player_id: string,
+        }
+    }
+    |
+    {
+        is_checkmate: false,
+        winner: "NA",
+    }
+)
 
 type Board = ({
     square: Square;
@@ -30,6 +42,7 @@ type Board = ({
 } | null)[][];
 
 export default function Game({params}:{params: {game_id: string}}){
+    const { toast } = useToast();
     const game_id = params.game_id;
     const session = useSession();
     const game_state = useRecoilValueLoadable(get_game_from_id({game_id}));
@@ -42,7 +55,23 @@ export default function Game({params}:{params: {game_id: string}}){
         const data:MoveCallbackData = JSON.parse(raw_data);
         setMoves((moves) => [...moves,data.to]);
         let updated_state = GameManager.get_instance().make_move(game_id,data.from,data.to,data.promotion);
-        setBoard(updated_state)
+        setBoard(updated_state);
+
+        if(data.is_game_over){
+            if(data.is_checkmate === true){
+                toast({
+                    title: "Checkmate",
+                    description: `${data.winner.color} won!!`
+                })
+            }
+    
+            if(data.is_draw === true){
+                toast({
+                    title: "Draw",
+                    description: `Game over. It's a draw`
+                })
+            }
+        }
     }
 
     function send_move(from: string,to: string, promotion?: string){
