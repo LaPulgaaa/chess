@@ -17,8 +17,11 @@ export class GameManager{
     }
 
     public add_game(game_id: string, fen: string){
-        if(this.games.has(game_id))
-            return this.games.get(game_id)!.board();
+        if(this.games.has(game_id)){
+            const game = this.games.get(game_id)!;
+            game.load(fen);
+            return game.board();
+        }
 
         this.games.set(game_id, new Chess(fen));
         return this.games.get(game_id)!.board();

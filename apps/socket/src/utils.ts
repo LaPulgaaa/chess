@@ -14,26 +14,6 @@ export async function create_game(game_id: string, userw: string, userb: string)
         },process.env.GAME_TOKEN ?? "supersecret");
 
         const resp = await prisma.$transaction(async(tx)=>{
-            const userw_id = await tx.user.findUnique({
-                where: {
-                    username: userw
-                },
-                select: {
-                    id: true,
-                }
-            });
-            const userb_id = await tx.user.findUnique({
-                where: {
-                    username: userb
-                },
-                select:{
-                    id: true,
-                }
-            });
-
-            if(userb_id === null || userw_id === null)
-                throw new Error("Users do not exist");
-
             const new_game = await tx.game.create({
                 data:{
                     uid: game_id,
@@ -49,13 +29,13 @@ export async function create_game(game_id: string, userw: string, userb: string)
             const players = await tx.player.createManyAndReturn({
                 data: [
                     {
-                        userId: userw_id.id,
+                        userId: userw,
                         color: "w",
                         gameId: new_game.uid,
                         gameToken: game_token
                     },
                     {
-                        userId: userb_id.id,
+                        userId: userb,
                         color: "b",
                         gameId: new_game.uid,
                         gameToken: game_token

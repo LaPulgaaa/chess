@@ -102,17 +102,19 @@ export type GameStartCallbackData = {
     }
 }
 
-export type LiveGameState = {
-    game_id: string,
-    player_id: string,
-    fen: string,
-    plays: string[],
-    status: "NOT_STARTED" | "IN_PROGRESS",
-    color: "w" | "b",
-    opponent: {
-        username: string,
-        rating: string,
-    },
-}
-
 export type GameStatus = z.output<typeof game_status_schema>;
+
+export const live_game_details_schema = z.object({
+    game_id: z.string(),
+    player_id: z.string(),
+    fen: z.string(),
+    plays: z.array(z.string()),
+    status: z.enum(["NOT_STARTED","IN_PROGRESS"]),
+    color: z.enum(["w","b"]),
+    opponent: z.object({
+        username: z.string(),
+        rating: z.number(),
+    })
+});
+
+export type LiveGameState = z.output<typeof live_game_details_schema>;

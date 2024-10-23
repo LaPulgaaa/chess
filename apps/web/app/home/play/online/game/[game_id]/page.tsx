@@ -1,17 +1,17 @@
 'use client'
 
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { FlipVertical } from "lucide-react";
 
-import { get_game_from_id } from "@repo/store";
-import { Button, ScrollArea, useToast } from "@repo/ui";
-import Board from "../../board";
 import type { Square, PieceSymbol, Color} from "chess.js"
 import { useSession } from "next-auth/react";
-import { useRecoilValueLoadable } from "recoil";
-import { useEffect, useRef, useState } from "react";
 import { SignallingManager } from "@/lib/singleton/signal_manager";
 import { GameManager } from "@/lib/singleton/game_manager";
 import { StarFilledIcon } from "@radix-ui/react-icons";
+import { Button, ScrollArea, useToast } from "@repo/ui";
+import Board from "../../board";
+import { LiveGameState, live_game_details_schema } from "@repo/types";
 
 type MoveCallbackData = {
     from: string,
@@ -42,14 +42,57 @@ type Board = ({
 } | null)[][];
 
 export default function Game({params}:{params: {game_id: string}}){
+    const router = useRouter();
     const { toast } = useToast();
     const game_id = params.game_id;
     const session = useSession();
-    const game_state = useRecoilValueLoadable(get_game_from_id({game_id}));
     const [board,setBoard] = useState<Board | undefined>(undefined);
     const [orient,setOrient] = useState<"w" | "b">("w");
     const [moves,setMoves] = useState<string[]>([]);
     const moves_ref = useRef<HTMLDivElement>(null);
+    const [gamestate,setGameState] = useState<LiveGameState>();
+
+    useEffect(() => {
+        async function fetch_messages(){
+
+            if(session.status !== "authenticated")
+                return;
+
+            try{
+                const resp = await fetch(`/api/player/live/${game_id}`,{
+                    next: {
+                        revalidate: 30,
+                    }
+                });
+                const { raw_data }:{ raw_data: LiveGameState } = await resp.json();
+                const parsed = live_game_details_schema.safeParse(raw_data);
+                if(parsed.success) {
+                    const parsed_data = parsed.data;
+                    setGameState(parsed.data);
+                    const board = GameManager.get_instance().add_game(game_id, parsed_data.fen);
+                    setBoard(board);
+                    setOrient(parsed_data.color);
+                    setMoves(parsed_data.plays);
+                }
+                else {
+                    toast({
+                        variant: "destructive",
+                        title: "Error fetching game!",
+                    })
+                    router.back();
+                }
+            }catch(err){
+                console.log(err);
+                toast({
+                    variant: "destructive",
+                    title: "Something bad happened!!",
+                })
+                router.back();
+            }
+        }
+
+        fetch_messages();
+    },[session.status])
 
     function move_callback(raw_data:string){
         const data:MoveCallbackData = JSON.parse(raw_data);
@@ -80,8 +123,8 @@ export default function Game({params}:{params: {game_id: string}}){
             payload: {
                 game_id,
                 player: {
-                    player_id: game_state.getValue()?.player_id,
-                    color: game_state.getValue()?.color
+                    player_id: gamestate?.player_id,
+                    color: gamestate?.color
                 },
                 from,
                 to,
@@ -104,15 +147,6 @@ export default function Game({params}:{params: {game_id: string}}){
     },[session.status]);
 
     useEffect(()=>{
-        if(game_state.state === "hasValue" && game_state.getValue()?.fen){
-            const board = GameManager.get_instance().add_game(game_id, game_state.getValue()!.fen);
-            setBoard(board);
-            setOrient(game_state.getValue()!.color);
-            setMoves(game_state.getValue()!.plays);
-        }
-    },[game_state.state, game_state.getValue()]);
-
-    useEffect(()=>{
         const move_node = moves_ref.current;
         if(move_node !== null){
             const move_divs = move_node.querySelectorAll("#moves");
@@ -127,19 +161,22 @@ export default function Game({params}:{params: {game_id: string}}){
         }
     },[moves]);
 
+    if(gamestate === undefined){
+        return <div>Loading...</div>
+    }
 
     return (
         <div>
             {
-                session.status === "authenticated" && game_state.state === "hasValue" && game_state.getValue() !== null && board ? 
+                session.status === "authenticated" && board ? 
                 <div className="flex lg:flex-row flex-col justify-between mx-12 md:mx-24 my-6 space-x-2">
                     <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"} mt-2`}>
                         <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
                             {
-                                game_state.getValue()?.color === "b" ? 
+                                gamestate.color === "b" ? 
                                 // @ts-ignore
                             <p className="text-muted-foreground">{session.data.username + `${` #`}` + session.data.rating}</p>  :
-                            <p className="text-muted-foreground">{game_state.getValue()?.opponent.username + `${` #`}` + game_state.getValue()?.opponent.rating}</p>
+                            <p className="text-muted-foreground">{gamestate.opponent.username + `${` #`}` + gamestate.opponent.rating}</p>
                             }
                         </div>
                         <div className="w-full flex items-center">
@@ -158,10 +195,10 @@ export default function Game({params}:{params: {game_id: string}}){
                         </div>
                         <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
                             {
-                            game_state.getValue()?.color === "w" ? 
+                            gamestate.color === "w" ? 
                             // @ts-ignore
                             <p className="text-muted-foreground">{session.data.username + `${` #`}` + session.data.rating}</p>  :
-                            <p className="text-muted-foreground">{game_state.getValue()?.opponent.username + `${` #`}` + game_state.getValue()?.opponent.rating}</p>
+                            <p className="text-muted-foreground">{gamestate.opponent.username + `${` #`}` + gamestate.opponent.rating}</p>
                             }
                         </div>
                     </div>

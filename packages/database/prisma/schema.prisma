@@ -87,7 +87,7 @@ model Friend {
 model Player {
   id String @id @default(cuid())
   color Color
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [username], onDelete: Cascade)
   userId String
   game Game @relation(fields: [gameId], references: [uid], onDelete: Cascade)
   gameId String
