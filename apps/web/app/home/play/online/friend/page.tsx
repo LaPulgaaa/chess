@@ -2,12 +2,13 @@
 
 import { HandshakeIcon, SearchIcon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage, Badge, Input } from "@repo/ui";
+import { Avatar, AvatarFallback, AvatarImage, Badge, Dialog, DialogContent, DialogTrigger, Input } from "@repo/ui";
 import { get_friends } from "./actions";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Search from "./search";
 import DummyBoard from "../dummy_board";
+import Profile from "./profile";
 
 export default async function Friend(){
     const session = await getServerSession();
@@ -34,23 +35,30 @@ export default async function Friend(){
                     <div className="space-y-2 mt-2 ml-2">
                         {friends && friends.map((friend)=>{
                             return (
-                                <div key={friend.email}
-                                className="flex space-x-2"
-                                >
-                                    <Avatar className="rounded-none">
-                                        <AvatarImage
-                                        className="rounded-none"
-                                        src = {friend.avatar ?? ""}
-                                        />
-                                        <AvatarFallback
-                                        className="rounded-none"
-                                        >{friend.username.substring(0,2)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex mt-2 justify-between space-x-2">
-                                        <p>{friend.username}</p>
-                                        <Badge className="mb-2">#{friend.rating}</Badge>
-                                    </div>
-                                </div>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <div key={friend.email}
+                                        className="flex space-x-2"
+                                        >
+                                            <Avatar className="rounded-none">
+                                                <AvatarImage
+                                                className="rounded-none"
+                                                src = {friend.avatar ?? ""}
+                                                />
+                                                <AvatarFallback
+                                                className="rounded-none"
+                                                >{friend.username.substring(0,2)}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex mt-2 justify-between space-x-2">
+                                                <p>{friend.username}</p>
+                                                <Badge className="mb-2">#{friend.rating}</Badge>
+                                            </div>
+                                        </div>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <Profile {...friend}/>
+                                    </DialogContent>
+                                </Dialog>
                             )
                         })}
                     </div>
