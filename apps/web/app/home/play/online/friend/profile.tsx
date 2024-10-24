@@ -29,11 +29,8 @@ import type { InviteMessage } from "@/lib/singleton/signal_manager";
 
 type Profile = {
     username: string;
-    name: string | null;
-    rating: number;
-    email: string;
+    rating: number;  
     avatar: string | null;
-    createdAt: Date;
 };
 
 export default function Profile(profile:Profile){
