@@ -77,6 +77,7 @@ model Friend {
 
   games Int
   won Int
+  draw Int
   createdAt DateTime? @default(now())
   latestMatchAt DateTime? @default(now())
 

@@ -44,8 +44,32 @@ export async function create_game(game_id: string, userw: string, userb: string)
                 select:{
                     id: true,
                     gameToken: true,
-                }
+                },
             });
+
+            let players_sorted_alphabetically = [userb,userw].sort();
+
+            await tx.friend.upsert({
+                where: {
+                    userFromId_userToId: {
+                        userFromId: players_sorted_alphabetically[0]!,
+                        userToId: players_sorted_alphabetically[1]!,
+                    }
+                },
+                create: {
+                    userFromId: players_sorted_alphabetically[0]!,
+                    userToId: players_sorted_alphabetically[1]!,
+                    games: 0,
+                    won: 0,
+                    draw: 0,
+                },
+                update: {
+                    games: {
+                        increment: 1,
+                    },
+                    latestMatchAt: new Date().toISOString(),
+                }
+            })
 
             return {
                 w: players[0]?.id!,

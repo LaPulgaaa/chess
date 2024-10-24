@@ -26,24 +26,30 @@ export default async function Friend(){
                     </h3>
                 </div>
                 <Search/>
-                <div className="w-full m-4 flex flex-cols">
-                    <div className="flex mx-6">
+                <div className="w-full px-6 mt-4">
+                    <div className="flex">
                         <p>Friends</p>
                         <Badge className="ml-1" variant={"secondary"}>{friends?.length ?? 0}</Badge>
                     </div>
-                    <div>
+                    <div className="space-y-2 mt-2 ml-2">
                         {friends && friends.map((friend)=>{
                             return (
                                 <div key={friend.email}
-                                className="flex space-x-4"
+                                className="flex space-x-2"
                                 >
-                                    <Avatar>
+                                    <Avatar className="rounded-none">
                                         <AvatarImage
+                                        className="rounded-none"
                                         src = {friend.avatar ?? ""}
                                         />
-                                        <AvatarFallback>{friend.username.substring(0,2)}</AvatarFallback>
+                                        <AvatarFallback
+                                        className="rounded-none"
+                                        >{friend.username.substring(0,2)}</AvatarFallback>
                                     </Avatar>
-                                    <p className="mt-2">{friend.username}</p>
+                                    <div className="flex mt-2 justify-between space-x-2">
+                                        <p>{friend.username}</p>
+                                        <Badge className="mb-2">#{friend.rating}</Badge>
+                                    </div>
                                 </div>
                             )
                         })}

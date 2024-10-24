@@ -52,12 +52,22 @@ export async function get_details(email: string | null | undefined){
                     }
                 },
                 avatar: true,
-                friends: {
+                fromFriendships: {
                     select: {
-                        user: {
+                        userTo: {
                             select: {
-                                avatar: true,
                                 username: true,
+                                avatar: true,
+                            }
+                        }
+                    }
+                },
+                toFriendships: {
+                    select: {
+                        userFrom: {
+                            select: {
+                                username: true,
+                                avatar: true,
                             }
                         }
                     }
@@ -140,12 +150,24 @@ export default async function Home(){
                                     <CommandEmpty>No results found.</CommandEmpty>
                                     <CommandGroup>
                                         {
-                                            user_details.friends.map(({user})=>{
+                                            user_details.fromFriendships.map(({userTo})=>{
                                                 return (
-                                                <CommandItem key={user.username}>
+                                                <CommandItem key={userTo.username}>
                                                     <Avatar>
-                                                        <AvatarImage src={user.avatar ?? ""}/>
-                                                        <AvatarFallback>{user.username.substring(0,2)}</AvatarFallback>
+                                                        <AvatarImage src={userTo.avatar ?? ""}/>
+                                                        <AvatarFallback>{userTo.username.substring(0,2)}</AvatarFallback>
+                                                    </Avatar>
+                                                </CommandItem>
+                                                )
+                                            })
+                                        }
+                                        {
+                                            user_details.toFriendships.map(({userFrom})=>{
+                                                return (
+                                                <CommandItem key={userFrom.username}>
+                                                    <Avatar>
+                                                        <AvatarImage src={userFrom.avatar ?? ""}/>
+                                                        <AvatarFallback>{userFrom.username.substring(0,2)}</AvatarFallback>
                                                     </Avatar>
                                                 </CommandItem>
                                                 )

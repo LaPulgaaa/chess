@@ -4,24 +4,52 @@ import prisma from "@repo/prisma";
 
 export async function get_friends(email: string){
     try{
-        const resp = await prisma.user.findUnique({
+        const resp = await prisma.friend.findMany({
             where: {
-                email
+                OR: [
+                    { 
+                        userFrom: {
+                            email,
+                        } 
+                    },
+                    {
+                        userTo: {
+                            email,
+                        }
+                    },
+                ]
             },
             select: {
-                friends: {
+                userFrom: {
                     select: {
                         username: true,
-                        avatar: true,
+                        rating: true,
                         email: true,
+                        avatar: true,
+                    }
+                },
+                userTo: {
+                    select: {
+                        username: true,
+                        rating: true,
+                        email: true,
+                        avatar: true,
                     }
                 }
             }
-        });
+        })
         if(resp === null)
             return null;
 
-        return resp.friends;
+        const friends = resp.map((friendships) => {
+            if(friendships.userFrom.email !== email)
+                return friendships.userFrom;
+            
+            return friendships.userTo;
+        });
+
+        return friends;
+
     }catch(err){
         console.log(err);
         return null;
