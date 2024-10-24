@@ -102,6 +102,13 @@ async function push_move_into_db(payload: RedisQueuePayload){
                             data: {
                                 result: "WON",
                                 finishedGame: true,
+                                user: {
+                                    update: {
+                                        rating: {
+                                            increment: 5,
+                                        }
+                                    }
+                                }
                             }
                         })
                         await tx.player.update({
@@ -111,6 +118,13 @@ async function push_move_into_db(payload: RedisQueuePayload){
                             data: {
                                 result: "LOST",
                                 finishedGame: true,
+                                user: {
+                                    update: {
+                                        rating: {
+                                            decrement: 5,
+                                        }
+                                    }
+                                }
                             }
                         })
                     })
