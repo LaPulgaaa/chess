@@ -164,7 +164,7 @@ export default async function Home(){
                         return(
                             <div
                             key={figure.key}
-                            className="flex flex-col m-2 border-[0.5px] rounded-md p-6 w-[248px] dark:hover:bg-zinc-900 transition duration-300 ease-in-out">
+                            className="flex flex-col border-[0.5px] p-6 w-[248px] dark:hover:bg-zinc-900 transition duration-300 ease-in-out">
                                 <div className="flex justify-between">
                                 <small className="text-sm font-medium leading-none">{figure.title}</small>
                                 <div className="text-muted-foreground pb-2"><HistoryIcon/></div>
@@ -179,7 +179,7 @@ export default async function Home(){
                     })
                 }
             </div>
-            <div className="md:flex flex-col items-center lg:flex-row md:justify-center mt-12 md:space-x-24 space-y-12">
+            <div className="md:flex flex-col items-center lg:flex-row md:justify-center mt-12 md:space-x-24">
                 <div className="flex flex-col space-y-4 mx-8 w-1/2">
                 <Link href={"/home/play/online/random"} className="flex">
                     <Button
@@ -201,7 +201,7 @@ export default async function Home(){
                     </Button>
                 </Link>
                 </div>
-                <div className="rounded-md border-2 w-3/4 h-[320px]">
+                <div className="border-2 w-full lg:w-3/4 h-[300px] mt-4">
                     <ScrollArea className="flex flex-col item-center">
                         <LiveGames/>
                     </ScrollArea>
