@@ -128,7 +128,7 @@ export default async function Home(){
             <div className="flex justify-between">
                 <div className="flex mx-8">
                     <Avatar>
-                        <AvatarImage src={user_details.avatar ?? ""} />
+                        <AvatarImage src={user_details.avatar ?? "https://avatar.varuncodes.com"} />
                         <AvatarFallback>{user_details.username.substring(0,2)}</AvatarFallback>
                     </Avatar>
                     <div className="flex mt-1 mx-2">

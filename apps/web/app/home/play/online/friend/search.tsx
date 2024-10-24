@@ -59,7 +59,7 @@ export default function Search(){
                                     >
                                         <AvatarImage
                                         className="rounded-none"
-                                        src = {result.avatar ?? "https://avatars.githubusercontent.com/u/123243429?v=4"}/>
+                                        src = {result.avatar ?? ""}/>
                                         <AvatarFallback
                                         className="rounded-none"
                                         >{result.username.substring(0,2)}</AvatarFallback>
