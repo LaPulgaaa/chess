@@ -27,6 +27,7 @@ type ChallengeCallbackData = {
         color: "w" | "b"
     },
     game_id: string,
+    variant: "RANDOM_INVITE" | "FRIEND_INVITE"
 })
 
 export default function Connect(){
@@ -95,6 +96,16 @@ export default function Connect(){
         }
     }
 
+    function play_random_callback(raw_data: string){
+        const data:ChallengeCallbackData = JSON.parse(raw_data);
+        if(data.success === false){
+            toast({
+                title: "Could not find an opponent!",
+                description: "Please adjust rating deviation or try later."
+            })
+        }
+    }
+
     useEffect(()=>{
         if(status === "authenticated"){
             //@ts-ignore
@@ -103,7 +114,8 @@ export default function Connect(){
             SignallingManager.get_instance().BULK_SUBSCRIBE(username);
             SignallingManager.get_instance().REGISTER_CALLBACK("INVITE",recieve_challenge_callbacks);
             SignallingManager.get_instance().REGISTER_CALLBACK("CHALLENGE", send_challenge_callback);
-            SignallingManager.get_instance().REGISTER_CALLBACK("GAME_START", start_game_callback);            
+            SignallingManager.get_instance().REGISTER_CALLBACK("GAME_START", start_game_callback);
+            SignallingManager.get_instance().REGISTER_CALLBACK("PLAY_RANDOM", play_random_callback);            
         }
 
         return ()=>{
@@ -114,6 +126,7 @@ export default function Connect(){
                 SignallingManager.get_instance().BULK_UNSUBSCRIBE(username);
                 SignallingManager.get_instance().DEREGISTER_CALLBACK("CHALLENGE");
                 SignallingManager.get_instance().DEREGISTER_CALLBACK("GAME_START");
+                SignallingManager.get_instance().DEREGISTER_CALLBACK("PLAY_RANDOM");
             }
         }
     },[status])

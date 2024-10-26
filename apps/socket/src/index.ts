@@ -1,6 +1,7 @@
 import { WebSocketServer as WSSocketServer }from "ws";
 import WebSocket from "ws";
 import { createClient } from "redis";
+import { v4 as uuidv4 } from "uuid"
 
 import { RedisSubscriptionManager } from "./room_manager";
 import { type Player, type PlayerMoveIncomingData , process_move} from "./game";
@@ -77,6 +78,25 @@ export type IncomingClientData = {
     payload: {
         user_id: string,
     }
+} | {
+    type: "ADD_AVAILABLE",
+    payload: {
+        user_id: string,
+        rating: number,
+    }
+} | {
+    type: "REMOVE_AVAILABLE",
+    payload: {
+        user_id: string,
+    }
+} | {
+    type: "PLAY_RANDOM",
+    payload: {
+        host_uid: string,
+        host_avatar: string,
+        host_rating: number,
+        deviation: number,
+    }
 };
 
 export const client = createClient();
@@ -87,6 +107,11 @@ export const online_clients: Record<number, {
     username: string,
 }> = {};
 let client_count = 0;
+export const available_players:Record<string,{
+    ws: WebSocket,
+    rating: number,
+    username: string,
+}> = {};
 
 start_queue_worker();
 
@@ -118,7 +143,8 @@ async function init_ws_server(){
                                 host_uid: data.payload.host_uid,
                                 host_color: data.payload.host_color,
                                 host_avatar: data.payload.host_avatar,
-                                game_id: data.payload.game_id
+                                game_id: data.payload.game_id,
+                                variant: "FRIEND_INVITE"
                             })
                         }))
                     }
@@ -318,6 +344,56 @@ async function init_ws_server(){
                         console.log(err);
                     }
                     break;
+                }
+                case "ADD_AVAILABLE":{
+                    const { user_id ,rating } = data.payload;
+                    available_players[user_id] = {
+                        rating,
+                        ws,
+                        username: user_id,
+                    }
+                    break;
+                }
+                case "REMOVE_AVAILABLE": {
+                    const { user_id } = data.payload;
+                    if(available_players[user_id]){
+                        delete available_players[user_id];
+                    }
+
+                    break;
+                }
+                case "PLAY_RANDOM": {
+                    const { host_avatar,host_uid,host_rating, deviation } = data.payload;
+                    const possible_online_opponent = Object.values(available_players).find((data) => {
+                        if(Math.abs(host_rating - data.rating) <= deviation && data.username !== host_uid){
+                            return data;
+                        }
+                    });
+
+                    if(possible_online_opponent !== undefined){
+                        const host_color = Math.random() < 0.5 ? "b" : "w";
+                        const invitee_ws = possible_online_opponent.ws;
+                        const game_id = uuidv4();
+                        invitee_ws.send(JSON.stringify({
+                            type: "INVITE",
+                            data: JSON.stringify({
+                                host_uid: host_uid,
+                                host_color: host_color,
+                                host_avatar: host_avatar,
+                                game_id: game_id,
+                                variant: "RANDOM_INVITE",
+                            })
+                        }))
+                    }
+                    else{
+                        ws.send(JSON.stringify({
+                            type: "PLAY_RANDOM",
+                            data: JSON.stringify({
+                                success: false,
+                            })
+                        }))
+                    }
+
                 }
             }
         })

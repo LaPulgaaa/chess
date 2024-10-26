@@ -132,6 +132,18 @@ export class SignallingManager {
         this.handle_send(message);
     }
 
+    ADD_AVAILABLE(data: string){
+        this.handle_send(data);
+    }
+
+    REMOVE_AVAILABLE(data: string){
+        this.handle_send(data);
+    }
+
+    PLAY_RANDOM(data: string){
+        this.handle_send(data);
+    }
+
     CHALLENGE(data: string){
         this.handle_send(data);
     }

@@ -80,7 +80,7 @@ export default function Search(){
                     })
                 }
             </div>
-            <RecievedChallenge/>
+            <RecievedChallenge variant="FRIEND_INVITE"/>
         </div>
     )
 }

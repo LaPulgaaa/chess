@@ -9,7 +9,7 @@ import { Button } from "@repo/ui";
 import { useSession } from "next-auth/react";
 import { useRecoilState } from "recoil"
 
-export default function RecievedChallenge(){
+export default function RecievedChallenge({ variant }:{ variant: "RANDOM_INVITE" | "FRIEND_INVITE" }){
     const session = useSession();
     const [recieved_challenges,setRecieved_Challenges] = useRecoilState(challenges);
 
@@ -56,6 +56,7 @@ export default function RecievedChallenge(){
             <div className="space-y-2 mt-2">
                 {
                     recieved_challenges ? recieved_challenges.map((challenge)=>{
+                        if(challenge.variant === variant)
                         return (
                             <div 
                             key={challenge.game_id}
