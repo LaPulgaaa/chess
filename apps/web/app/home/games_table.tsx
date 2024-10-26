@@ -9,7 +9,7 @@ import {
     TableCell,
 } from "@repo/ui";
 
-type Matches = {
+export type Match = {
     uid: string,
     createdAt: Date;
     moves: {
@@ -25,9 +25,9 @@ type Matches = {
             avatar: string | null;
         };
     }[];
-}[]
+}
 
-export default function GamesTable({matches}:{matches:Matches}){
+export default function GamesTable({matches}:{matches:Match[]}){
     return (
         <div>
             <Table className="rounded-md border-2">
