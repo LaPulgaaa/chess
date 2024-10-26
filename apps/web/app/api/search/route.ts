@@ -9,9 +9,11 @@ export async function GET(req:NextRequest){
             where: {
                 username: {
                     contains: creds,
+                    mode: "insensitive"
                 },
                 email: {
                     contains: creds,
+                    mode: "insensitive",
                 }
             },
             select:{
