@@ -17,7 +17,7 @@ export async function create_game(game_id: string, userw: string, userb: string)
             const new_game = await tx.game.create({
                 data:{
                     uid: game_id,
-                    status: "NOT_STARTED"
+                    status: "IN_PROGRESS"
                 },
                 select: {
                     currentState: true,
