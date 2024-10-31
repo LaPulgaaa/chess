@@ -40,9 +40,9 @@ const piece_store:PieceStore = {
     bp: bp,
 };
 
-export default function DummyBoard(){
+export default function DummyBoard({fen}:{fen?: string}){
 
-    const board = new Chess().board();
+    const board = new Chess(fen).board();
 
     const board_ref = useRef<HTMLDivElement>(null);
     let square_refs = useRef<Map<string, HTMLSpanElement | null>>(new Map());

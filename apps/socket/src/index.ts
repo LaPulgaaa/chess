@@ -97,6 +97,18 @@ export type IncomingClientData = {
         host_rating: number,
         deviation: number,
     }
+} | {
+    type: "STREAM_GAME",
+    payload: {
+        game_id: string,
+        user_id: string,
+    }
+} | {
+    type: "STOP_STREAM",
+    payload: {
+        game_id: string,
+        user_id: string,
+    }
 };
 
 export const client = createClient();
@@ -246,6 +258,14 @@ async function init_ws_server(){
                             room_id: data.payload.game_id,
                             payload
                         });
+                        const stream_payload = JSON.stringify({
+                            type: "STREAM_GAME",
+                            data: resp,
+                        })
+                        RedisSubscriptionManager.get_instance().message({
+                            room_id: `watch:${data.payload.game_id}`,
+                            payload: stream_payload,
+                        })
                     }
                     const db_content = JSON.stringify({
                         type: "MOVE",
@@ -393,8 +413,34 @@ async function init_ws_server(){
                             })
                         }))
                     }
-
+                    break;
                 }
+                case "STREAM_GAME":{
+                    const {game_id,user_id} = data.payload; 
+                    RedisSubscriptionManager.get_instance().subscribe({
+                        room_id: `watch:${game_id}`,
+                        client: {
+                            ws,
+                            id: ws_id.toString(),
+                            user_id,
+                        }
+                    });
+
+                    break;
+                }
+                case "STOP_STREAM":{
+                    const { game_id, user_id } = data.payload;
+                    RedisSubscriptionManager.get_instance().unsubscribe({
+                        room_id: `watch:${game_id}`,
+                        client: {
+                            ws,
+                            user_id,
+                            id: ws_id.toString()
+                        }
+                    })
+                    break;
+                }
+                
             }
         })
         ws.on("close",()=>{

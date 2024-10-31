@@ -10,8 +10,10 @@ import {
 } from "@repo/ui";
 
 import { LiveGametoWatch } from "./actions";
+import { useRouter } from "next/navigation";
 
 export default function LiveGamesTable({matches}:{matches:LiveGametoWatch[]}){
+    const router = useRouter();
     return (
         <div className="m-12">
             <Table className="rounded-md border-2">
@@ -30,6 +32,10 @@ export default function LiveGamesTable({matches}:{matches:LiveGametoWatch[]}){
                             matches.map((match) => {
                                 return(
                                     <TableRow
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        router.push(`/home/watch/game/${match.uid}`)
+                                    }}
                                     key={match.uid}
                                     >
                                         <TableCell>

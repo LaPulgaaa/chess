@@ -77,6 +77,7 @@ export async function process_move(incoming_data: PlayerMoveIncomingData["payloa
             is_draw,
             is_game_over,
             winner,
+            updated_fen: game.fen(),
         };
 
         return JSON.stringify(payload);

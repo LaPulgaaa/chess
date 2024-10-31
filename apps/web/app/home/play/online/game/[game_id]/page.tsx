@@ -13,7 +13,7 @@ import { Button, ScrollArea, useToast } from "@repo/ui";
 import Board from "../../board";
 import { LiveGameState, live_game_details_schema } from "@repo/types";
 
-type MoveCallbackData = {
+export type MoveCallbackData = {
     from: string,
     to: string,
     color: "w" | "b",
