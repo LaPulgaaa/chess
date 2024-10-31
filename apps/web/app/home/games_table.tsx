@@ -80,7 +80,7 @@ export default function GamesTable({matches}:{matches:Match[]}){
                                             {match.moves.length}
                                         </TableCell>
                                         <TableCell>
-                                            {match.createdAt.toUTCString()}
+                                            {match.createdAt.toLocaleString()}
                                         </TableCell>
                                     </TableRow>
                                 )
