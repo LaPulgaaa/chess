@@ -216,7 +216,7 @@ export default async function Home(){
                         <span className="ml-2">Play a Friend</span>
                     </Button>
                 </Link>
-                <Link href={"/"} className="flex">
+                <Link href={"/home/watch"} className="flex">
                     <Button className="p-8 w-full" size={"lg"}>
                         <ListVideoIcon/>
                         <span className="ml-2">Watch live</span>
