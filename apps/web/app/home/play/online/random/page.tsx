@@ -29,7 +29,7 @@ export default function Online(){
                     deviation: Number.parseInt(posDev)-Number.parseInt(negDev),
                 }
             })
-            SignallingManager.get_instance().PLAY_RANDOM(message);
+            SignallingManager.get_instance().HANDLE_MESSAGE(message);
             toast({
                 title: "Waiting for opponent"
             })
@@ -49,7 +49,7 @@ export default function Online(){
                     rating,
                 }
             })
-            SignallingManager.get_instance(username).ADD_AVAILABLE(message);
+            SignallingManager.get_instance(username).HANDLE_MESSAGE(message);
         }
         return () => {
             if(session.status === "authenticated"){
@@ -61,7 +61,7 @@ export default function Online(){
                         user_id: username,
                     }
                 });
-                SignallingManager.get_instance(username).REMOVE_AVAILABLE(message);
+                SignallingManager.get_instance(username).HANDLE_MESSAGE(message);
             }
         }
     },[session.status])

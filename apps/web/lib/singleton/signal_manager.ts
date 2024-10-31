@@ -76,7 +76,7 @@ export class SignallingManager {
             },
         })
 
-        this.handle_send(message);
+        this.HANDLE_MESSAGE(message);
     }
 
     BULK_SUBSCRIBE(user_id: string){
@@ -87,7 +87,7 @@ export class SignallingManager {
             }
         });
 
-        this.handle_send(message);
+        this.HANDLE_MESSAGE(message);
     }
 
     BULK_UNSUBSCRIBE(user_id: string){
@@ -97,7 +97,7 @@ export class SignallingManager {
                 user_id,
             }
         });
-        this.handle_send(message);
+        this.HANDLE_MESSAGE(message);
     }
 
     LEAVE(){
@@ -105,7 +105,7 @@ export class SignallingManager {
             type: "LEAVE",
         });
 
-        this.handle_send(message);
+        this.HANDLE_MESSAGE(message);
     }
 
     REGISTER_CALLBACK(type: string, callback: (data: string)=>void){
@@ -129,34 +129,10 @@ export class SignallingManager {
             },
         })
 
-        this.handle_send(message);
+        this.HANDLE_MESSAGE(message);
     }
 
-    ADD_AVAILABLE(data: string){
-        this.handle_send(data);
-    }
-
-    REMOVE_AVAILABLE(data: string){
-        this.handle_send(data);
-    }
-
-    PLAY_RANDOM(data: string){
-        this.handle_send(data);
-    }
-
-    CHALLENGE(data: string){
-        this.handle_send(data);
-    }
-
-    PLAY(message: string){
-        this.handle_send(message);
-    }
-
-    MOVE(message: string){
-        this.handle_send(message);
-    }
-
-    private handle_send(message: string){
+    HANDLE_MESSAGE(message: string){
         if(!this.initialised){
             this.buffered_message.push({
                 id: this.id++,
@@ -168,4 +144,5 @@ export class SignallingManager {
 
         this.ws.send(message);
     }
+
 }

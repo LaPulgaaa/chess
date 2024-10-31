@@ -132,7 +132,7 @@ export default function Game({params}:{params: {game_id: string}}){
                 promotion
             }
         })
-        SignallingManager.get_instance().MOVE(message);
+        SignallingManager.get_instance().HANDLE_MESSAGE(message);
     }
 
     useEffect(()=>{

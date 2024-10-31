@@ -92,7 +92,7 @@ export default function Connect(){
                     }
                 }
             });
-            SignallingManager.get_instance().PLAY(message);
+            SignallingManager.get_instance().HANDLE_MESSAGE(message);
         }
     }
 

@@ -39,7 +39,7 @@ export default function RecievedChallenge({ variant }:{ variant: "RANDOM_INVITE"
                     }
                 }
             })
-            SignallingManager.get_instance().CHALLENGE(message);
+            SignallingManager.get_instance().HANDLE_MESSAGE(message);
         }
         else{
             alert("Not verified");
