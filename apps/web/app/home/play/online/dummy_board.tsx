@@ -62,7 +62,7 @@ export default function DummyBoard({fen}:{fen?: string}){
     return(
         <div 
         ref={board_ref}
-        className={`w-full mt-4 flex flex-col`}>
+        className={`w-full flex flex-col`}>
             {
                 board.map((row,row_no)=>{
                     return(

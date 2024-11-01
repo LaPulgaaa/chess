@@ -1,22 +1,26 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { z } from "zod";
+
+import { useEffect, useState, useRef } from "react";
+import { StarFilledIcon } from "@radix-ui/react-icons";
 import DummyBoard from "../../../play/online/dummy_board";
-import { game_broadcast_init_game_schema } from "@repo/types";
+import { game_broadcast_init_game_schema, player_data } from "@repo/types";
 import { useSession } from "next-auth/react";
 import { SignallingManager } from "@/lib/singleton/signal_manager";
 import { MoveCallbackData } from "@/app/home/play/online/game/[game_id]/page";
 import { useToast } from "@repo/ui";
 import { ScrollArea } from "@repo/ui";
-import { useRef } from "react";
-import { StarFilledIcon } from "@radix-ui/react-icons";
 
+type PlayerData = z.output<typeof player_data>;
 export default function GameBroadCast({params}:{params: {game_id: string}}){
     const [fen,setFen] = useState<string>();
     const session = useSession();
     const { toast } = useToast();
     const moves_ref = useRef<HTMLDivElement>(null);
     const [moves,setMoves] = useState<string[]>();
+    const [white,setWhite] = useState<PlayerData>();
+    const [black,setBlack] = useState<PlayerData>();
 
     useEffect(()=>{
         async function fetch_board(){
@@ -27,6 +31,15 @@ export default function GameBroadCast({params}:{params: {game_id: string}}){
                 setFen(data.currentState);
                 const prev_moves = data.moves.map((m) => m.move);
                 setMoves(prev_moves);
+
+                data.players.forEach((player) => {
+                    if(player.color === "b"){
+                        setBlack(player);
+                    }
+                    else if(player.color === "w"){
+                        setWhite(player);
+                    }
+                })
             }catch(err){
                 console.log(err);
             }
@@ -103,36 +116,50 @@ export default function GameBroadCast({params}:{params: {game_id: string}}){
         }
     },[moves]);
     return(
-        <div className="flex lg:flex-row flex-col justify-between m-12 space-x-2 m-24">
-            <DummyBoard fen={fen}/>
-            <div className="w-[720px] m-2">
-                        <div className="flex items-center dark:bg-zinc-800 p-2 py-3">
-                            <StarFilledIcon className="mx-2"/>
-                            <h3 className="scroll-m-20 font-semibold tracking-tight">
-                                Moves Played
-                            </h3>
-                        </div>
-                        <ScrollArea className="md:h-[800px] h-[640px]">
-                           { 
-                                moves && <div 
-                                    ref={moves_ref}
-                                    className="grid grid-cols-2">
-                                    {
-                                        moves.map((move,i) => {
-                                            return(
-                                                <div
-                                                key={i}
-                                                id="moves"
-                                                className={`p-2 my-1 ${i%2 == 0 ? "dark:bg-zinc-700" : "dark:bg-zinc-800"}`}>
-                                                    {move}
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                </div>
-                            }
-                        </ScrollArea>
+        <div className="m-12 mx-24">
+            <div className="flex lg:flex-row flex-col justify-between space-x-2">
+                <div>
+                <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
+                    {
+                        black && <p className="text-muted-foreground">{black.user.username}<span className="mt-1"> #{black.user.rating}</span></p>
+                    }
+                </div>
+                <DummyBoard fen={fen}/>
+                <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
+                    {
+                        white && <p className="text-muted-foreground">{white.user.username}<span className=" mt-1"> #{white.user.rating}</span></p>
+                    }
+                </div>
+                </div>
+                <div className="w-1/2">
+                    <div className="flex items-center dark:bg-zinc-800 p-2 py-3">
+                        <StarFilledIcon className="mx-2"/>
+                        <h3 className="scroll-m-20 font-semibold tracking-tight">
+                            Moves Played
+                        </h3>
                     </div>
+                    <ScrollArea className="md:h-[800px] h-[640px]">
+                    { 
+                            moves && <div 
+                                ref={moves_ref}
+                                className="grid grid-cols-2">
+                                {
+                                    moves.map((move,i) => {
+                                        return(
+                                            <div
+                                            key={i}
+                                            id="moves"
+                                            className={`p-2 my-1 ${i%2 == 0 ? "dark:bg-zinc-700" : "dark:bg-zinc-800"}`}>
+                                                {move}
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        }
+                    </ScrollArea>
+                </div>
+            </div>
         </div>
     )
 }

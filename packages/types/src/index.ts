@@ -119,16 +119,18 @@ export const live_game_details_schema = z.object({
 
 export type LiveGameState = z.output<typeof live_game_details_schema>;
 
+export const player_data = z.object({
+    user: z.object({
+        username: z.string(),
+        rating: z.number(),
+    }),
+    color: color_schema,
+});
+
 export const game_broadcast_init_game_schema = z.object({
     currentState: z.string(),
     moves: z.array(z.object({
         move: z.string(),
     })),
-    players: z.array(z.object({
-        user: z.object({
-            username: z.string(),
-            rating: z.number(),
-        }),
-        color: color_schema,
-    })),
+    players: z.array(player_data),
 })
