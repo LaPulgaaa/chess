@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getServerSession } from "next-auth";
-import { HistoryIcon, ListVideoIcon, Users, Users2 } from "lucide-react";
+import { HistoryIcon, ListVideoIcon, LogOutIcon, Settings, User, Users, Users2 } from "lucide-react";
 
 import knight from "@/public/knight.png"
 import { 
@@ -26,7 +26,11 @@ import {
     Table,
     TableHeader,
     TableRow,
-    TableHead
+    TableHead,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuGroup,
+    DropdownMenuItem
 } from "@repo/ui";
 import prisma from "@repo/prisma";
 
@@ -34,6 +38,8 @@ import { get_matches } from "./actions";
 import LiveGames from "./live_games";
 import Navbar from "@/components/navbar";
 import GamesTable from "./games_table";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import SettingsDropdown from "./settings-dropdown";
 
 export async function get_details(email: string | null | undefined){
     if(email === null || email === undefined)
@@ -141,43 +147,7 @@ export default async function Home(){
                     </div>
                 </div>
                 <div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger><Users2/></DropdownMenuTrigger>
-                        <DropdownMenuContent className="md:min-w-[400px]">
-                        <Command className="rounded-lg border shadow-md md:min-w-[400px]">
-                                <CommandInput placeholder="Search your friends..." />
-                                <CommandList>
-                                    <CommandEmpty>No results found.</CommandEmpty>
-                                    <CommandGroup>
-                                        {
-                                            user_details.fromFriendships.map(({userTo})=>{
-                                                return (
-                                                <CommandItem key={userTo.username}>
-                                                    <Avatar>
-                                                        <AvatarImage src={userTo.avatar ?? ""}/>
-                                                        <AvatarFallback>{userTo.username.substring(0,2)}</AvatarFallback>
-                                                    </Avatar>
-                                                </CommandItem>
-                                                )
-                                            })
-                                        }
-                                        {
-                                            user_details.toFriendships.map(({userFrom})=>{
-                                                return (
-                                                <CommandItem key={userFrom.username}>
-                                                    <Avatar>
-                                                        <AvatarImage src={userFrom.avatar ?? ""}/>
-                                                        <AvatarFallback>{userFrom.username.substring(0,2)}</AvatarFallback>
-                                                    </Avatar>
-                                                </CommandItem>
-                                                )
-                                            })
-                                        }
-                                    </CommandGroup>
-                                </CommandList>
-                            </Command>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <SettingsDropdown/>
                 </div>
             </div>
             <div className="hidden md:flex flex-col items-center lg:flex-row md:justify-center my-4 ">
