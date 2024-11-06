@@ -50,7 +50,11 @@ export default function Login(){
 
             }
         }catch(err){
-
+            console.log(err);
+            toast({
+                variant: "destructive",
+                title: "Error signing in!",
+            })
         }
     }
 
