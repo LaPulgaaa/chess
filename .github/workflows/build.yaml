@@ -1,0 +1,39 @@
+name: Build workflow github
+run-name: Running ci workflow on ${{ github.repository }} by ${{ github.actor }}
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: 
+      - master
+
+defaults:
+  run:
+    shell: bash
+
+permissions: 
+  contents: read
+  pull-requests: read
+
+jobs:
+  build: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install 
+      - name: Generate prisma client
+        env: 
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        working-directory: ./packages/database
+        run: npx prisma generate
+      - name: Run Build
+        run: npm run build 
+      
