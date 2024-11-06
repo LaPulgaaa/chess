@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { getServerSession } from "next-auth";
-import { HistoryIcon, ListVideoIcon, LogOutIcon, Settings, User, Users, Users2 } from "lucide-react";
+import { HistoryIcon, ListVideoIcon, Users } from "lucide-react";
 
 import knight from "@/public/knight.png"
 import { 
@@ -13,24 +13,7 @@ import {
     AvatarFallback,
     AvatarImage,
     Button,
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput, CommandItem,
-    CommandList,
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger, 
     ScrollArea,
-    TableCaption,
-    Table,
-    TableHeader,
-    TableRow,
-    TableHead,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuGroup,
-    DropdownMenuItem
 } from "@repo/ui";
 import prisma from "@repo/prisma";
 
@@ -38,10 +21,9 @@ import { get_matches } from "./actions";
 import LiveGames from "./live_games";
 import Navbar from "@/components/navbar";
 import GamesTable from "./games_table";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import SettingsDropdown from "./settings-dropdown";
 
-export async function get_details(email: string | null | undefined){
+async function get_details(email: string | null | undefined){
     if(email === null || email === undefined)
         return null;
     try{

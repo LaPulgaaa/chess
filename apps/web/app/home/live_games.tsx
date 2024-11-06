@@ -9,12 +9,12 @@ import wq from "@/public/wq.png";
 import bq from "@/public/bq.png";
 
 import { live_games_store } from "@repo/store"
-import { useRouter } from "next/navigation";
+
 import Link from "next/link";
 
 export default function LiveGames(){
     const session = useSession();
-    const router = useRouter();
+
     //@ts-ignore
     const live_games = useRecoilValueLoadable(live_games_store);
 

@@ -23,9 +23,6 @@ import bb from "@/public/bb.png";
 import bq from "@/public/bq.png";
 import bk from "@/public/bk.png";
 import bp from "@/public/bp.png";
-import { DoubleArrowUpIcon } from "@radix-ui/react-icons";
-
-import { Button } from "@repo/ui";
 
 type PieceWithColor = "wr" | "wn" | "wb" | "wq" | "wk" | "wp" | "br" | "bn" | "bb" | "bq" | "bk" | "bp";
 
@@ -49,16 +46,16 @@ const piece_store:PieceStore = {
 const DARK_WHITE = "#b0bec5";
 const DARK_BLACK = "#37474f";
 
-const LIGHT_WHITE = "#f0d9b5";
-const LIGHT_BLACK = "#b58863";
+// const LIGHT_WHITE = "#f0d9b5";
+// const LIGHT_BLACK = "#b58863";
 
 const DARK_FOCUSED = "#ffeb3b";
 const DARK_POSSIBLE = "#4caf50";
 
-const LIGHT_FOCUSED = "#ffeb3b";
-const LIGHT_POSSIBLE = "#a1d99b";
+// const LIGHT_FOCUSED = "#ffeb3b";
+// const LIGHT_POSSIBLE = "#a1d99b";
 
-const LIGHT_CAPTURE = "#f77f7f";
+// const LIGHT_CAPTURE = "#f77f7f";
 const DARK_CAPTURE = "#e57373";
 
 type Board = ({
@@ -66,8 +63,6 @@ type Board = ({
     type: PieceSymbol;
     color: Color;
 } | null)[][];
-
-
 
 export default function Board({board,game_id,make_move,color}:{board: Board,game_id: string,make_move:(from: string, to: string, promotion?: string) => void,color: "b" | "w"}){
 
@@ -83,7 +78,6 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
     }
 
     function assign_id(row: number, col: number){
-        let square: string = "";
         let row_id: string = (8-row).toString();
         let col_id: string = String.fromCharCode(97+col);
         return col_id+row_id;

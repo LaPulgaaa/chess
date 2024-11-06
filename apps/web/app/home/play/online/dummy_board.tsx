@@ -52,7 +52,6 @@ export default function DummyBoard({fen}:{fen?: string}){
     }
 
     function assign_id(row: number, col: number){
-        let square: string = "";
         let row_id: string = (8-row).toString();
         let col_id: string = String.fromCharCode(97+col);
         return col_id+row_id;

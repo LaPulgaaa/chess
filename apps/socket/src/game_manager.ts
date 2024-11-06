@@ -1,4 +1,4 @@
-import { Chess, Move } from "chess.js"
+import { Chess } from "chess.js"
 
 type GameState = {
     chess: Chess,

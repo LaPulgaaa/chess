@@ -1,8 +1,8 @@
 'use server'
 
-import { HandshakeIcon, SearchIcon } from "lucide-react";
+import { HandshakeIcon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage, Badge, Dialog, DialogContent, DialogTrigger, Input } from "@repo/ui";
+import { Avatar, AvatarFallback, AvatarImage, Badge, Dialog, DialogContent, DialogTrigger } from "@repo/ui";
 import { get_friends } from "./actions";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";

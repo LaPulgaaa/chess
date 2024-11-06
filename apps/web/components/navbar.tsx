@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ModeToggle, Button } from "@repo/ui";
+import { ModeToggle } from "@repo/ui";
 
 export default function Navbar(){
     return (
