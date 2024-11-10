@@ -5,6 +5,7 @@ import prisma from "@repo/prisma";
 import { getToken } from "next-auth/jwt";
 
 export async function GET(req:NextRequest){
+    //@ts-ignore
     const token = await getToken({ req });
 
     if(token === null){

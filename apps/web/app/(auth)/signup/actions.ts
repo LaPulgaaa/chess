@@ -6,7 +6,7 @@ import { user_signup_form_schema } from "@repo/types";
 
 type FormData = z.infer<typeof user_signup_form_schema>;
 
-export const is_username_taken = async(username: string) => {
+export async function is_username_taken(username: string) {
     try{
         const possible_username = await prisma.user.findFirst({
             where: {
@@ -27,7 +27,7 @@ export const is_username_taken = async(username: string) => {
     }
 }
 
-export const create_user = async(data:FormData) => {
+export async function create_user(data:FormData) {
     const user = await prisma.$transaction(async(tx)=>{
         const new_user = await tx.user.create({
             data:{

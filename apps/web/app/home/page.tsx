@@ -158,7 +158,9 @@ export default async function Home(){
                 <Link href={"/home/play/online/random"} className="flex">
                     <Button
                     className="p-8 w-full" size={"lg"}>
-                        <Image src={knight} alt="knight" style={{width:"24px"}}/>
+                        <Image 
+                        loading="lazy"
+                        src={knight} alt="knight" style={{width:"24px"}}/>
                         <span className="ml-2">Play online</span>
                     </Button>
                 </Link>

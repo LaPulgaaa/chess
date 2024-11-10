@@ -1,8 +1,8 @@
 import prisma from "@repo/prisma";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest, {params}:{params:{game_id: string}}){
-    const game_id = params.game_id;
+export async function GET(req: NextRequest, {params}:{params:Promise<{ game_id: string }>}){
+    const game_id = (await params).game_id;
     try{
         const resp = await prisma.game.findUnique({
             where: {

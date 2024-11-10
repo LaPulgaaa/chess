@@ -41,10 +41,10 @@ type Board = ({
     color: Color;
 } | null)[][];
 
-export default function Game({params}:{params: {game_id: string}}){
+export default async function Game({params}:{params: Promise<{game_id: string}>}){
     const router = useRouter();
     const { toast } = useToast();
-    const game_id = params.game_id;
+    const game_id = (await params).game_id;
     const session = useSession();
     const [board,setBoard] = useState<Board | undefined>(undefined);
     const [orient,setOrient] = useState<"w" | "b">("w");
@@ -117,7 +117,7 @@ export default function Game({params}:{params: {game_id: string}}){
         }
     }
 
-    function send_move(from: string,to: string, promotion?: string){
+    function send_move({from,to,promotion}:{from: string,to: string, promotion?: string}){
         const message = JSON.stringify({
             type: 'MOVE',
             payload: {
@@ -168,7 +168,7 @@ export default function Game({params}:{params: {game_id: string}}){
     return (
         <div>
             {
-                session.status === "authenticated" && board ? 
+                session.status === "authenticated" && board !== undefined ? 
                 <div className="flex lg:flex-row flex-col justify-between mx-12 md:mx-24 my-6 space-x-2">
                     <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"} mt-2`}>
                         <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
