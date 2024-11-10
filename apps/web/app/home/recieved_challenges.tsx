@@ -9,19 +9,19 @@ import { Button } from "@repo/ui";
 import { useSession } from "next-auth/react";
 import { useRecoilState } from "recoil"
 
-export default function RecievedChallenge({ variant }:{ variant: "RANDOM_INVITE" | "FRIEND_INVITE" }){
+export default function RecievedChallenge(){
     const session = useSession();
     const [recieved_challenges,setRecieved_Challenges] = useRecoilState(challenges);
 
     function refuse_challenge(toremove_gid: string){
-        const left_challenges = recieved_challenges.filter((c)=>c.game_id !== toremove_gid);
+        const left_challenges = recieved_challenges.filter((c) => c.game_id !== toremove_gid);
         setRecieved_Challenges([...left_challenges]);
     }
 
     function accept_challenge(challenge: ChallengeRecieved){
 
         if(session.status === "authenticated"){
-            const left_challenges = recieved_challenges.filter((c)=>c.game_id !== challenge.game_id);
+            const left_challenges = recieved_challenges.filter((c) => c.game_id !== challenge.game_id);
             setRecieved_Challenges([...left_challenges]);
             const message = JSON.stringify({
                 type: "CHALLENGE",
@@ -56,7 +56,6 @@ export default function RecievedChallenge({ variant }:{ variant: "RANDOM_INVITE"
             <div className="space-y-2 mt-2">
                 {
                     recieved_challenges ? recieved_challenges.map((challenge)=>{
-                        if(challenge.variant === variant)
                         return (
                             <div 
                             key={challenge.game_id}

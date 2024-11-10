@@ -64,7 +64,7 @@ type Board = ({
     color: Color;
 } | null)[][];
 
-export default function Board({board,game_id,make_move,color}:{board: Board,game_id: string,make_move:(from: string, to: string, promotion?: string) => void,color: "b" | "w"}){
+export default function Board({board,game_id,make_move,color}:{board: Board,game_id: string,make_move:({from,to,promotion}:{from: string, to: string, promotion?: string}) => void,color: "b" | "w"}){
 
     let [focusedpiece,setFocusedPiece] = useState<HTMLSpanElement | null>(null);
     let [validmove,setValidMoves] = useState<string[] | undefined>(undefined);
@@ -93,12 +93,18 @@ export default function Board({board,game_id,make_move,color}:{board: Board,game
 
             const promotable_sq = validmove?.filter((m) => m.includes("="));
 
-            //@ts-ignore
             if(from !== to && validmove !== undefined){
                 if(promotable_sq && promotable_sq.length > 0)
-                make_move(from,to,'q');
+                make_move({
+                    from,
+                    to,
+                    promotion: 'q',
+                });
                 else
-                make_move(from,to);
+                make_move({
+                    from,
+                    to,
+                });
 
             }
 

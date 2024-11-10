@@ -13,7 +13,7 @@ import { useToast } from "@repo/ui";
 import { ScrollArea } from "@repo/ui";
 
 type PlayerData = z.output<typeof player_data>;
-export default function GameBroadCast({params}:{params: {game_id: string}}){
+export default async function GameBroadCast({params}:{params: Promise<{game_id: string}>}){
     const [fen,setFen] = useState<string>();
     const session = useSession();
     const { toast } = useToast();
@@ -21,11 +21,12 @@ export default function GameBroadCast({params}:{params: {game_id: string}}){
     const [moves,setMoves] = useState<string[]>();
     const [white,setWhite] = useState<PlayerData>();
     const [black,setBlack] = useState<PlayerData>();
+    const game_id = (await params).game_id
 
     useEffect(()=>{
         async function fetch_board(){
             try{
-                const resp = await fetch(`/api/game/${params.game_id}`);
+                const resp = await fetch(`/api/game/${game_id}`);
                 const {data : raw_data} = await resp.json();
                 const data = game_broadcast_init_game_schema.parse(raw_data);
                 setFen(data.currentState);
@@ -76,7 +77,7 @@ export default function GameBroadCast({params}:{params: {game_id: string}}){
             const message = JSON.stringify({
                 type: "STREAM_GAME",
                 payload: {
-                    game_id: params.game_id,
+                    game_id: game_id,
                     user_id: username,
                 }
             });
@@ -91,7 +92,7 @@ export default function GameBroadCast({params}:{params: {game_id: string}}){
                 const message = JSON.stringify({
                     type: "STOP_STREAM",
                     payload: {
-                        game_id: params.game_id,
+                        game_id: game_id,
                         user_id: username,
                     }
                 });
@@ -124,7 +125,7 @@ export default function GameBroadCast({params}:{params: {game_id: string}}){
                         black && <p className="text-muted-foreground">{black.user.username}<span className="mt-1"> #{black.user.rating}</span></p>
                     }
                 </div>
-                <DummyBoard fen={fen}/>
+                {fen && <DummyBoard fen={fen}/>}
                 <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">
                     {
                         white && <p className="text-muted-foreground">{white.user.username}<span className=" mt-1"> #{white.user.rating}</span></p>
