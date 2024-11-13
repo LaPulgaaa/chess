@@ -3,7 +3,10 @@
   "ui": "tui",
   "globalEnv": [
     "NEXTAUTH_URL",
-    "NEXTAUTH_SECRET"
+    "NEXTAUTH_SECRET",
+    "DATABASE_URL",
+    "GITHUB_CLIENT_ID",
+    "GITHUB_CLIENT_SECRET"
   ],
   "tasks": {
     "build": {
