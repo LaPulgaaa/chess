@@ -80,7 +80,7 @@ export default function Search(){
                     })
                 }
             </div>
-            <RecievedChallenge/>
+            {/* {session.status === "authenticated" && <RecievedChallenge/>} */}
         </div>
     )
 }

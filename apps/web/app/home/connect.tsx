@@ -34,8 +34,8 @@ export default function Connect(){
     const router = useRouter();
     const session = useSession();
     const { toast } = useToast();
-    const setMyChallenges = useSetRecoilState<ChallengeRecieved[]>(challenges);
-    const refreshLiveGameState = useRecoilRefresher_UNSTABLE(live_games_store);
+    // const setMyChallenges = useSetRecoilState<ChallengeRecieved[]>(challenges);
+    // const refreshLiveGameState = useRecoilRefresher_UNSTABLE(live_games_store);
 
     const status = session.status;
 
@@ -46,14 +46,14 @@ export default function Connect(){
             draggable: true,
             title: "Redirecting to new game..."
         });
-        refreshLiveGameState();
+        // refreshLiveGameState();
         router.push(`/home/play/online/game/${data.game_id}`)
     }
 
     function recieve_challenge_callbacks(raw_data: string){
         const data:ChallengeRecieved = JSON.parse(raw_data);
         const host_color = data.host_color === "w" ? "black" : "white";
-        setMyChallenges((challenges) => [...challenges,data]);
+        // setMyChallenges((challenges) => [...challenges,data]);
         toast({
             title: "You recieved a challenge",
             description: `${data.host_uid} challenged you for a game with ${host_color} pieces`,

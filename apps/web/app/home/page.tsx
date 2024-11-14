@@ -179,7 +179,7 @@ export default async function Home(){
                 </div>
                 <div className="border-2 w-full lg:w-3/4 h-[300px] mt-4">
                     <ScrollArea className="flex flex-col item-center">
-                        <LiveGames/>
+                        {/* <LiveGames/> */}
                     </ScrollArea>
                 </div>
             </div>

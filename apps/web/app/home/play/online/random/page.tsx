@@ -114,7 +114,7 @@ export default function Online(){
                 <Button 
                 onClick={send_play_random_request}
                 size={"lg"} className="w-1/2 mt-4">PLAY</Button>
-                {session.status === "authenticated" && <RecievedChallenge/>}
+                {/* { session.status === "authenticated" && <RecievedChallenge/> } */}
             </div>
         </div>
     )
