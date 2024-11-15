@@ -149,11 +149,21 @@ async function init_ws_server(){
                     const may_be_online_invitee = Object.values(online_clients).find(({username})=> username === invitee);
                     if(may_be_online_invitee !== undefined){
                         const invitee_ws = may_be_online_invitee.ws;
+                        const game_color = data.payload.host_color === "r" ? Math.random() > .5 ? "b" : "w" : data.payload.host_color;
+                        await prisma.challenge.create({
+                            data: {
+                                hostUid: data.payload.host_uid,
+                                inviteeUid: may_be_online_invitee.username,
+                                game_id: data.payload.game_id,
+                                variant: "FRIEND_INVITE",
+                                hostColor: game_color
+                            }
+                        })
                         invitee_ws.send(JSON.stringify({
                             type: "INVITE",
                             data: JSON.stringify({
                                 host_uid: data.payload.host_uid,
-                                host_color: data.payload.host_color,
+                                host_color: game_color,
                                 host_avatar: data.payload.host_avatar,
                                 game_id: data.payload.game_id,
                                 variant: "FRIEND_INVITE"
