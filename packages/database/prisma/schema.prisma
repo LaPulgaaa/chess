@@ -57,6 +57,9 @@ model User {
   toFriendships Friend[] @relation(name: "to")
   sessions Session[]
 
+  challengesSent Challenge[] @relation(name: "host")
+  challengesRecieved Challenge[] @relation(name: "invitee")
+
   @@unique([email])
   @@unique([username])
   @@index([rating])
@@ -153,4 +156,21 @@ model Session {
 enum Provider {
   CREDENTIAL
   GOOGLE
+}
+
+enum Invite {
+  RANDOM_INVITE
+  FRIEND_INVITE
+}
+
+model Challenge {
+  id Int @id @default(autoincrement())
+  game_id String
+  variant Invite
+  hostColor Color
+  hostUid String
+  hostUser User @relation(name: "host",fields: [hostUid], references: [username], onDelete: Cascade)
+
+  inviteeUid String
+  inviteeUser User @relation(name: "invitee", fields: [inviteeUid], references: [username], onDelete: Cascade)
 }
