@@ -3,33 +3,39 @@
 import Image from "next/image";
 
 import { useSession } from "next-auth/react"
-import { useRecoilValueLoadable } from "recoil"
 
 import wq from "@/public/wq.png";
 import bq from "@/public/bq.png";
 
-import { live_games_store } from "@repo/store"
-
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { LiveGameState } from "@repo/types";
 
 export default function LiveGames(){
     const session = useSession();
+    const [live_games,setLiveGames] = useState<LiveGameState[]>();
 
-    //@ts-ignore
-    const live_games = useRecoilValueLoadable(live_games_store);
-
-    if(session.status !== "authenticated")
-    {
-        return (
-            <div>Loading....</div>
-        )
-    }
+    useEffect(()=>{
+        const fetch_live_games = async() => {
+            try{
+                const resp = await fetch(`/api/player/live/`,{
+                    cache: "no-store"
+                });
+                const {data}:{data:LiveGameState[]} = await resp.json();
+                setLiveGames(data);
+            }catch(err){
+                console.log(err);
+                return null;
+            }
+        }
+        fetch_live_games();
+    },[])
 
     return (
         <div className="p-4">
             <h4 className="mb-4 text-sm font-medium leading-none">Live Games</h4>
             {
-                live_games.state === "hasValue" && live_games.getValue()?.map((game)=>{
+                live_games ?  live_games.map((game)=>{
                     const piece_img = game.color === "b" ? wq : bq;
                     const plays_str = game.plays.slice(-7).join(",")
                     return (
@@ -53,7 +59,7 @@ export default function LiveGames(){
                         </div>
                         </Link>
                     )
-                })
+                }) : <div>Loading ....</div>
             }
         </div>
     )

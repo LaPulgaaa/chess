@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRecoilRefresher_UNSTABLE, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
-import { challenges, live_games_store } from "@repo/store";
+import { challenges } from "@repo/store";
 import type { ChallengeRecieved } from "@repo/store";
 import type { GameStartCallbackData } from "@repo/types";
 import { ToastAction, useToast } from "@repo/ui";
@@ -35,7 +35,6 @@ export default function Connect(){
     const session = useSession();
     const { toast } = useToast();
     // const setMyChallenges = useSetRecoilState<ChallengeRecieved[]>(challenges);
-    // const refreshLiveGameState = useRecoilRefresher_UNSTABLE(live_games_store);
 
     const status = session.status;
 
@@ -46,7 +45,6 @@ export default function Connect(){
             draggable: true,
             title: "Redirecting to new game..."
         });
-        // refreshLiveGameState();
         router.push(`/home/play/online/game/${data.game_id}`)
     }
 
