@@ -2,7 +2,7 @@
 
 import { UserSearchIcon } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage, Badge, Dialog, DialogContent, DialogTrigger, Input } from "@repo/ui";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { search_users_by_creds } from "./actions";
 import Profile from "./profile";
 import { useSession } from "next-auth/react";
@@ -71,16 +71,18 @@ export default function Search(){
                                 </div>
                                 </DialogTrigger>
                                 <DialogContent className="dark:bg-zinc-900 bg-orange-100">
-                                    <Profile {
-                                        ...result
-                                    }/>
+                                    <Suspense fallback={<div>Loading...</div>}>
+                                        <Profile {
+                                            ...result
+                                        }/>
+                                    </Suspense>
                                 </DialogContent>
                             </Dialog>
                         )
                     })
                 }
             </div>
-            {/* {session.status === "authenticated" && <RecievedChallenge/>} */}
+            {session.status === "authenticated" && <RecievedChallenge/>}
         </div>
     )
 }
