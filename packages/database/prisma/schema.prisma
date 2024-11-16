@@ -165,7 +165,7 @@ enum Invite {
 
 model Challenge {
   id Int @id @default(autoincrement())
-  game_id String
+  gameId String
   variant Invite
   hostColor Color
   hostUid String
