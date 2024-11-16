@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 
 import { SignallingManager } from "@/lib/singleton/signal_manager";
 import { CheckIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { challenges } from "@repo/store";
 import { ChallengeRecieved } from "@repo/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui";
 import { Badge } from "@repo/ui";

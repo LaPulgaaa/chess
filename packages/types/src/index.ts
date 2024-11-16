@@ -136,9 +136,11 @@ export const game_broadcast_init_game_schema = z.object({
 })
 
 export type ChallengeRecieved = {
-    host_uid: string,
-    host_color: "w" | "b",
-    host_avatar: string,
-    game_id: string,
+    hostUser: {
+        username: string,
+        avatar: string | null,
+    },
+    gameId: string,
+    hostColor: "w" | "b",
     variant: "FRIEND_INVITE" | "RANDOM_INVITE",
 }

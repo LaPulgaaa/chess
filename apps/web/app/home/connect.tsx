@@ -2,10 +2,8 @@
 
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useSetRecoilState } from "recoil";
 
-import { challenges } from "@repo/store";
-import type { ChallengeRecieved } from "@repo/store";
+import type { ChallengeRecieved } from "@repo/types";
 import type { GameStartCallbackData } from "@repo/types";
 import { ToastAction, useToast } from "@repo/ui";
 
@@ -35,7 +33,6 @@ export default function Connect(){
     const session = useSession();
     const { toast } = useToast();
     const pathname = usePathname();
-    // const setMyChallenges = useSetRecoilState<ChallengeRecieved[]>(challenges);
 
     const status = session.status;
 
@@ -52,8 +49,6 @@ export default function Connect(){
     function recieve_challenge_callbacks(raw_data: string){
         const data:ChallengeRecieved = JSON.parse(raw_data);
         const host_color = data.hostColor === "w" ? "black" : "white";
-        console.log(pathname);
-        // setMyChallenges((challenges) => [...challenges,data]);
         toast({
             title: "You recieved a challenge",
             description: `${data.hostUser.username} challenged you for a game with ${host_color} pieces`,
