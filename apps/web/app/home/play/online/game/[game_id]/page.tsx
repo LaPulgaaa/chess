@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FlipVertical } from "lucide-react";
 
@@ -41,16 +41,31 @@ type Board = ({
     color: Color;
 } | null)[][];
 
-export default async function Game({params}:{params: Promise<{game_id: string}>}){
+export default function Game({params}: {params: Promise<{ game_id: string }>}){
+    const {game_id} = use(params)
     const router = useRouter();
     const { toast } = useToast();
-    const game_id = (await params).game_id;
     const session = useSession();
     const [board,setBoard] = useState<Board | undefined>(undefined);
     const [orient,setOrient] = useState<"w" | "b">("w");
     const [moves,setMoves] = useState<string[]>([]);
     const moves_ref = useRef<HTMLDivElement>(null);
     const [gamestate,setGameState] = useState<LiveGameState>();
+
+    useEffect(()=>{
+        const move_node = moves_ref.current;
+        if(move_node !== null){
+            const move_divs = move_node.querySelectorAll("#moves");
+            if(move_divs.length<1)
+                return ;
+
+            const last_move_div_idx = move_divs.length-1;
+            move_divs[last_move_div_idx]?.scrollIntoView({
+                inline: "end",
+                behavior: "smooth"
+            })
+        }
+    },[moves]);
 
     useEffect(() => {
         async function fetch_messages(){
@@ -146,29 +161,10 @@ export default async function Game({params}:{params: Promise<{game_id: string}>}
         }
     },[session.status]);
 
-    useEffect(()=>{
-        const move_node = moves_ref.current;
-        if(move_node !== null){
-            const move_divs = move_node.querySelectorAll("#moves");
-            if(move_divs.length<1)
-                return ;
-
-            const last_move_div_idx = move_divs.length-1;
-            move_divs[last_move_div_idx]?.scrollIntoView({
-                inline: "end",
-                behavior: "smooth"
-            })
-        }
-    },[moves]);
-
-    if(gamestate === undefined){
-        return <div>Loading...</div>
-    }
-
     return (
         <div>
             {
-                session.status === "authenticated" && board !== undefined ? 
+                gamestate && session.status === "authenticated" && board ? 
                 <div className="flex lg:flex-row flex-col justify-between mx-12 md:mx-24 my-6 space-x-2">
                     <div className={`flex ${orient === "w" ? "flex-col" : "flex-col-reverse"} mt-2`}>
                         <div className="dark:bg-zinc-800 md:w-[800px] w-[640px] p-4">

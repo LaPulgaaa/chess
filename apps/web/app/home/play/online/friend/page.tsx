@@ -36,7 +36,7 @@ export default async function Friend(){
                     <div className="space-y-2 mt-2 ml-2">
                         {friends && friends.map((friend)=>{
                             return (
-                                <Dialog>
+                                <Dialog key={friend.username}>
                                     <DialogTrigger>
                                         <div key={friend.email}
                                         className="flex space-x-2"

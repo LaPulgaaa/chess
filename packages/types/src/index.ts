@@ -134,3 +134,11 @@ export const game_broadcast_init_game_schema = z.object({
     })),
     players: z.array(player_data),
 })
+
+export type ChallengeRecieved = {
+    host_uid: string,
+    host_color: "w" | "b",
+    host_avatar: string,
+    game_id: string,
+    variant: "FRIEND_INVITE" | "RANDOM_INVITE",
+}
