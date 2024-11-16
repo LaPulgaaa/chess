@@ -1,5 +1,6 @@
 'use server'
 
+import { Suspense } from "react";
 import { HandshakeIcon } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage, Badge, Dialog, DialogContent, DialogTrigger } from "@repo/ui";
@@ -56,7 +57,9 @@ export default async function Friend(){
                                         </div>
                                     </DialogTrigger>
                                     <DialogContent>
-                                        <Profile {...friend}/>
+                                        <Suspense fallback={<div>Loading...</div>}>
+                                            <Profile {...friend}/>
+                                        </Suspense>
                                     </DialogContent>
                                 </Dialog>
                             )

@@ -10,7 +10,7 @@ import type { GameStartCallbackData } from "@repo/types";
 import { ToastAction, useToast } from "@repo/ui";
 
 import { SignallingManager } from "@/lib/singleton/signal_manager";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 
 type ChallengeCallbackData = {
@@ -34,6 +34,7 @@ export default function Connect(){
     const router = useRouter();
     const session = useSession();
     const { toast } = useToast();
+    const pathname = usePathname();
     // const setMyChallenges = useSetRecoilState<ChallengeRecieved[]>(challenges);
 
     const status = session.status;
@@ -50,12 +51,17 @@ export default function Connect(){
 
     function recieve_challenge_callbacks(raw_data: string){
         const data:ChallengeRecieved = JSON.parse(raw_data);
-        const host_color = data.host_color === "w" ? "black" : "white";
+        const host_color = data.hostColor === "w" ? "black" : "white";
+        console.log(pathname);
         // setMyChallenges((challenges) => [...challenges,data]);
         toast({
             title: "You recieved a challenge",
-            description: `${data.host_uid} challenged you for a game with ${host_color} pieces`,
-            action: <ToastAction altText="Accepted">Accept</ToastAction>
+            description: `${data.hostUser.username} challenged you for a game with ${host_color} pieces`,
+            action: <ToastAction 
+            onClick={() => {
+                router.refresh();
+            }}
+            altText="Accepted">View</ToastAction>
         })
     }
 

@@ -154,7 +154,7 @@ async function init_ws_server(){
                             data: {
                                 hostUid: data.payload.host_uid,
                                 inviteeUid: may_be_online_invitee.username,
-                                game_id: data.payload.game_id,
+                                gameId: data.payload.game_id,
                                 variant: "FRIEND_INVITE",
                                 hostColor: game_color
                             }
@@ -162,9 +162,11 @@ async function init_ws_server(){
                         invitee_ws.send(JSON.stringify({
                             type: "INVITE",
                             data: JSON.stringify({
-                                host_uid: data.payload.host_uid,
-                                host_color: game_color,
-                                host_avatar: data.payload.host_avatar,
+                                hostUser: {
+                                    username: data.payload.host_uid,
+                                    avatar: data.payload.host_avatar,
+                                },
+                                hostColor: game_color,
                                 game_id: data.payload.game_id,
                                 variant: "FRIEND_INVITE"
                             })
