@@ -54,7 +54,9 @@ export default function GamesTable({matches}:{matches:Match[]}){
                                                 {
                                                     match.players.map((player)=>{
                                                         return(
-                                                            <div className="flex space-x-2">
+                                                            <div 
+                                                            key={player.user.username}
+                                                            className="flex space-x-2">
                                                                 <span 
                                                                 className={`${player.color === "b" ? "bg-zinc-900" : "bg-gray-200"} w-[20px]`}></span>
                                                                 <p>{player.user.username}</p>
